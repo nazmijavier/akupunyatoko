@@ -109,6 +109,7 @@
       <button data-t="hero">✏️ Hero</button>
       <button data-t="look">🎨 Warna</button>
       <button data-t="box">📦 Box</button>
+      <button data-t="text">📝 Teks</button>
     </div>
 
     <!-- PRODUK -->
@@ -189,6 +190,18 @@
       </div>
     </div>
 
+    <div class="tabpane" data-pane="text">
+      <div class="panel">
+        <h2>Teks Lain di Situs</h2>
+        <label>Badge atas judul (eyebrow)</label><input type="text" id="t_eyebrow">
+        <label>Banner Pre-Order (paling atas)</label><input type="text" id="t_preorder">
+        <label>Teks rating</label><input type="text" id="t_rating">
+        <label>Judul "Request Khusus" <small>(boleh pakai &lt;br&gt;)</small></label><input type="text" id="t_bulktitle">
+        <label>Sub "Request Khusus"</label><textarea id="t_bulksub"></textarea>
+        <label>Catatan pembayaran <small>(muncul di "Cara terima")</small></label><input type="text" id="t_paynote">
+      </div>
+    </div>
+
     <div class="bar"><div class="bar-in">
       <button class="btn btn-primary" id="save">⬇️ Download file baru</button>
       <button class="btn btn-ghost" id="reload">File lain</button>
@@ -246,6 +259,10 @@ function render(){
   SWATCH.forEach(function(c){var b=document.createElement("button");b.style.background=c;b.onclick=function(){$("t_accent").value=c;$("t_accent_hex").value=c;applyAccent(c);};sw.appendChild(b);});
 
   $("wa").value=cfg.wa||"";
+  cfg.text=cfg.text||{};
+  $("t_eyebrow").value=cfg.text.eyebrow||"";$("t_preorder").value=cfg.text.preorderBar||"";
+  $("t_rating").value=cfg.text.ratingText||"";$("t_bulktitle").value=cfg.text.bulkTitle||"";
+  $("t_bulksub").value=cfg.text.bulkSub||"";$("t_paynote").value=cfg.text.payNote||"";
   $("b_on").checked=(cfg.boxesOn!==false);paintBoxArea();
   renderProducts();renderBoxes();
 }
@@ -262,6 +279,7 @@ function renderProducts(){
       '<label class="switch red"><input type="checkbox" class="f-sold"'+(p.soldOut?' checked':'')+'><span class="track"></span> Tandai habis</label>'+
       '<div class="photoRow"><div class="thumb" data-thumb></div><div class="upwrap"><label class="upbtn">📷 Ganti foto<input type="file" class="f-img" accept="image/*"></label><button type="button" class="rmimg">Hapus</button><div class="imgnote"></div></div></div>'+
       '<label>Nama</label><input type="text" class="f-name" value="'+esc(p.name)+'">'+
+      '<label>Deskripsi singkat <small>(tampil di bawah judul)</small></label><input type="text" class="f-tagline" value="'+esc(p.tagline)+'" placeholder="Isi cheesecake creamy + selai stroberi">'+
       '<div class="row"><div><label>Harga (Rp)</label><input type="number" class="f-price" value="'+(p.price||0)+'"></div>'+
       '<div><label>Kategori / badge</label><select class="f-cat">'+opts+'</select></div></div>'+
       '<div class="pricePrev"></div><label>Deskripsi</label><textarea class="f-desc">'+esc(p.desc)+'</textarea>';
@@ -322,6 +340,7 @@ $("t_accent_hex").addEventListener("input",function(){var v=this.value.trim();if
 
 $("save").addEventListener("click",function(){
   cfg.wa=$("wa").value.trim();
+  cfg.text={eyebrow:$("t_eyebrow").value,preorderBar:$("t_preorder").value,ratingText:$("t_rating").value,bulkTitle:$("t_bulktitle").value,bulkSub:$("t_bulksub").value,payNote:$("t_paynote").value};
   var th=cfg.theme||{};th.accent=$("t_accent").value;delete th.font;cfg.theme=th;
   cfg.hero={line1:$("h_l1").value,line2:$("h_l2").value,copy:$("h_copy").value};
   var mode=(promoMode==="midnight")?"midnight":"rolling";
@@ -330,7 +349,7 @@ $("save").addEventListener("click",function(){
   cfg.boxesOn=$("b_on").checked;cfg.ordersOn=$("o_on").checked;
   document.querySelectorAll(".prod").forEach(function(d){var id=d.dataset.id,p=cfg.products[id]||{};
     p.name=d.querySelector(".f-name").value;p.price=parseInt(d.querySelector(".f-price").value,10)||0;
-    p.cat=d.querySelector(".f-cat").value;p.desc=d.querySelector(".f-desc").value;p.soldOut=d.querySelector(".f-sold").checked;
+    p.cat=d.querySelector(".f-cat").value;p.desc=d.querySelector(".f-desc").value;p.tagline=d.querySelector(".f-tagline").value;p.soldOut=d.querySelector(".f-sold").checked;
     if(photos[id]&&photos[id].indexOf("data:")===0)p.img=photos[id];else if("img" in p)delete p.img;
     cfg.products[id]=p;});
   document.querySelectorAll(".boxcard").forEach(function(d){var b=cfg.boxes[+d.dataset.idx];if(!b)return;
