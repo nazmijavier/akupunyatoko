@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel Edit · MochiMeychi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FAF5EC; --card:#fff; --ink:#2b2350; --muted:#6b6391;
+    --accent:#5A48CF; --line:#e7e2d6; --line2:#efe9dc; --ok:#1faa59;
+    --warn:#E8902E; --soft:#F2EFFB;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--cream);color:var(--ink);
+    font-family:"Plus Jakarta Sans",system-ui,-apple-system,sans-serif;
+    font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:760px;margin:0 auto;padding:22px 16px 80px}
+  h1{font-size:24px;font-weight:800;margin:0 0 4px}
+  h1 .em{color:var(--accent)}
+  .lead{color:var(--muted);font-size:14px;margin:0 0 18px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:18px;margin-bottom:16px}
+  .panel h2{font-size:13px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--accent);margin:0 0 14px;display:flex;align-items:center;gap:8px}
+  label{display:block;font-weight:700;font-size:13px;margin:12px 0 5px}
+  label small{font-weight:500;color:var(--muted)}
+  input[type=text],input[type=number],select,textarea{
+    width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;
+    font-family:inherit;font-size:14px;color:var(--ink);background:#fffdf8}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);
+    box-shadow:0 0 0 3px rgba(90,72,207,.12)}
+  textarea{min-height:78px;resize:vertical;line-height:1.55}
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .row>div{flex:1;min-width:140px}
+  /* toggle */
+  .switch{display:inline-flex;align-items:center;gap:10px;cursor:pointer;font-weight:700;font-size:14px}
+  .switch input{display:none}
+  .track{width:46px;height:26px;border-radius:999px;background:#d7d1c2;position:relative;transition:.2s}
+  .track::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;
+    background:#fff;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+  .switch input:checked + .track{background:var(--ok)}
+  .switch input:checked + .track::after{transform:translateX(20px)}
+  /* product card */
+  .prod{border:1px solid var(--line2);border-radius:14px;padding:14px;margin-bottom:12px;background:#fffdf8}
+  .prod .ph{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:4px}
+  .prod .pid{font-size:11px;font-weight:700;color:var(--muted);background:var(--soft);
+    padding:3px 8px;border-radius:999px}
+  .pricePrev{font-size:13px;font-weight:700;margin-top:6px}
+  .pricePrev s{color:var(--muted);font-weight:600;margin-right:6px}
+  .pricePrev .now{color:var(--accent)}
+  .pricePrev .off{background:#fdecec;color:#d23;font-weight:800;font-size:11px;
+    padding:2px 7px;border-radius:999px;margin-left:6px}
+  /* buttons */
+  .bar{position:sticky;bottom:0;background:linear-gradient(transparent,var(--cream) 26%);
+    padding:16px 0 6px;margin-top:8px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    width:100%;padding:14px;border-radius:12px;border:0;font-family:inherit;
+    font-weight:800;font-size:15px;cursor:pointer}
+  .btn-primary{background:var(--ink);color:#fff}
+  .btn-primary:disabled{opacity:.45;cursor:not-allowed}
+  .btn-ghost{background:#fff;color:var(--ink);border:1px solid var(--line);margin-top:10px}
+  .drop{border:2px dashed var(--line);border-radius:14px;padding:26px 16px;text-align:center;
+    background:#fffdf8;cursor:pointer}
+  .drop strong{color:var(--accent)}
+  .drop input{display:none}
+  .hint{font-size:12.5px;color:var(--muted);margin-top:6px}
+  .ok-msg{display:none;background:#eafaf0;border:1px solid #bfe9cf;color:#157a44;
+    border-radius:10px;padding:10px 12px;font-size:13px;font-weight:700;margin-top:10px}
+  .seg{display:flex;gap:6px;flex-wrap:wrap}
+  .seg button{flex:1;min-width:110px;padding:9px;border:1px solid var(--line);background:#fffdf8;
+    border-radius:10px;font-family:inherit;font-weight:700;font-size:13px;color:var(--ink);cursor:pointer}
+  .seg button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .steps{counter-reset:s;margin:0 0 16px;padding:0;list-style:none}
+  .steps li{position:relative;padding:8px 0 8px 34px;font-size:13.5px;color:var(--ink);border-bottom:1px dashed var(--line)}
+  .steps li:last-child{border:0}
+  .steps li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:7px;
+    width:23px;height:23px;border-radius:50%;background:var(--accent);color:#fff;
+    font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center}
+  .colorRow{display:flex;align-items:center;gap:12px}
+  .colorRow input[type=color]{width:54px;height:42px;padding:2px;border-radius:10px;border:1px solid var(--line);cursor:pointer}
+  .swatches{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .swatches button{width:30px;height:30px;border-radius:8px;border:2px solid #fff;
+    box-shadow:0 0 0 1px var(--line);cursor:pointer}
+  .hideUntil{display:none}
+  .photoRow{display:flex;gap:12px;align-items:center;margin:8px 0 4px}
+  .thumb{width:72px;height:72px;border-radius:10px;border:1px solid var(--line);
+    background:#f1edfa center/cover no-repeat;flex:none;display:flex;align-items:center;
+    justify-content:center;font-size:10px;color:var(--muted);text-align:center;padding:4px}
+  .upwrap{flex:1;min-width:0}
+  .upbtn{display:inline-block;background:var(--soft);color:var(--accent);border:1px solid var(--line);
+    border-radius:9px;padding:7px 12px;font-weight:700;font-size:13px;cursor:pointer;margin:0}
+  .upbtn input{display:none}
+  .rmimg{background:none;border:0;color:#d23;font-family:inherit;font-weight:700;font-size:12.5px;
+    cursor:pointer;margin-left:8px;display:none}
+  .imgnote{font-size:11.5px;color:var(--muted);margin-top:5px}
+  .preview-hero{background:var(--cream);border:1px solid var(--line);border-radius:12px;
+    padding:16px;text-align:center;margin-top:10px}
+  .preview-hero .h{font-size:20px;font-weight:800;line-height:1.2}
+  .preview-hero .h .em{color:var(--accent)}
+  .preview-hero .c{font-size:13px;color:var(--muted);margin-top:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Panel Edit <span class="em">MochiMeychi</span></h1>
+  <p class="lead">Ubah harga, teks, promo, dan warna tanpa ngoding. Tinggal buka file, edit, download, lalu upload ke Vercel.</p>
+
+  <div class="panel" id="loadPanel">
+    <h2>📂 Mulai</h2>
+    <ol class="steps">
+      <li>Buka file <b>index-minimal.html</b> kamu di bawah ini.</li>
+      <li>Edit harga / teks / promo sesukamu.</li>
+      <li>Klik <b>Download file baru</b>.</li>
+      <li>Upload file itu ke Vercel (drag &amp; drop ke project), nanti situs ke-update sendiri.</li>
+    </ol>
+    <label class="drop" id="drop">
+      <strong>Klik untuk pilih file</strong> index-minimal.html<br>
+      <span class="hint">atau seret file ke sini</span>
+      <input type="file" id="file" accept=".html,text/html">
+    </label>
+    <div class="hint" id="fname"></div>
+  </div>
+
+  <div id="form" class="hideUntil">
+
+    <div class="panel">
+      <h2>🔥 Diskon &amp; Promo</h2>
+      <label class="switch"><input type="checkbox" id="p_on"><span class="track"></span> Tampilkan banner diskon</label>
+      <div id="promoFields">
+        <div class="row">
+          <div>
+            <label>Besar diskon (%) <small>saran 15–25%</small></label>
+            <input type="number" id="p_pct" min="1" max="80">
+          </div>
+          <div>
+            <label>Teks label</label>
+            <input type="text" id="p_label" placeholder="Promo hari ini">
+          </div>
+        </div>
+        <label>Reset / batas waktu</label>
+        <div class="seg" id="p_mode">
+          <button data-m="midnight">Harian (tengah malam)</button>
+          <button data-m="rolling72">Tiap 3 hari</button>
+          <button data-m="custom">Custom jam</button>
+        </div>
+        <div id="p_custom" class="hideUntil">
+          <label>Reset tiap berapa jam</label>
+          <input type="number" id="p_hours" min="1" value="24">
+        </div>
+        <p class="hint" id="p_explain"></p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>✏️ Judul Utama (Hero)</h2>
+      <label>Baris 1</label>
+      <input type="text" id="h_l1">
+      <label>Baris 2 <small>(warna aksen)</small></label>
+      <input type="text" id="h_l2">
+      <label>Kalimat pendukung</label>
+      <textarea id="h_copy"></textarea>
+      <div class="preview-hero">
+        <div class="h"><span id="pv1"></span><br><span class="em" id="pv2"></span></div>
+        <div class="c" id="pvc"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>🎨 Warna Aksen</h2>
+      <div class="colorRow">
+        <input type="color" id="t_accent">
+        <input type="text" id="t_accent_hex" style="max-width:140px">
+      </div>
+      <div class="swatches" id="swatches"></div>
+      <p class="hint">Warna ini dipakai untuk tombol, link, harga, dan judul aksen.</p>
+    </div>
+
+    <div class="panel">
+      <h2>💬 Nomor WhatsApp</h2>
+      <label>Format internasional tanpa "+" <small>contoh: 6282112564173</small></label>
+      <input type="text" id="wa">
+    </div>
+
+    <div class="panel">
+      <h2>🍡 Produk &amp; Harga</h2>
+      <p class="hint" style="margin-top:0;margin-bottom:12px">Harga coret otomatis dihitung dari % diskon. Foto produk tetap diatur lewat chat ya (bukan di sini).</p>
+      <div id="prods"></div>
+    </div>
+
+    <div class="ok-msg" id="okmsg">✅ File baru berhasil dibuat. Cek folder Download kamu, lalu upload ke Vercel.</div>
+    <div class="bar">
+      <button class="btn btn-primary" id="save">⬇️ Download file baru</button>
+      <button class="btn btn-ghost" id="reload">Buka file lain</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var START="/*MOCHI_CONFIG_START*/", END="/*MOCHI_CONFIG_END*/";
+var raw="", fileName="index-minimal.html", cfg=null, promoMode="midnight", photos={};
+function compress(file,cb){
+  var im=new Image();
+  im.onload=function(){
+    var max=900,w=im.width,hh=im.height;
+    if(w>max||hh>max){var r=Math.min(max/w,max/hh);w=Math.round(w*r);hh=Math.round(hh*r);}
+    var c=document.createElement("canvas");c.width=w;c.height=hh;
+    c.getContext("2d").drawImage(im,0,0,w,hh);
+    cb(c.toDataURL("image/jpeg",0.82));
+  };
+  im.onerror=function(){alert("Foto gagal dibaca, coba file lain.");};
+  im.src=URL.createObjectURL(file);
+}
+function kb(dataurl){return Math.round((dataurl.length*0.75)/1024);}
+var SWATCH=["#5A48CF","#E0518A","#E8902E","#1faa59","#3B7DD8","#9b59b6","#d6336c","#2b2350"];
+var CATS=[["terlaris","Terlaris"],["new","New"],["","(tanpa badge)"]];
+
+function $(id){return document.getElementById(id);}
+function rupiah(n){return "Rp"+(Number(n)||0).toLocaleString("id-ID");}
+function esc(s){return (s==null?"":String(s)).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function wasPrice(p,pct){var r=Math.round(p/(1-pct/100)/500)*500;return r>p?r:0;}
+
+/* ---------- load ---------- */
+var drop=$("drop"), fileEl=$("file");
+drop.addEventListener("dragover",function(e){e.preventDefault();drop.style.borderColor="var(--accent)";});
+drop.addEventListener("dragleave",function(){drop.style.borderColor="";});
+drop.addEventListener("drop",function(e){e.preventDefault();drop.style.borderColor="";if(e.dataTransfer.files[0])readFile(e.dataTransfer.files[0]);});
+fileEl.addEventListener("change",function(){if(fileEl.files[0])readFile(fileEl.files[0]);});
+
+function readFile(f){
+  fileName=f.name||"index-minimal.html";
+  var rd=new FileReader();
+  rd.onload=function(){
+    raw=rd.result;
+    var i=raw.indexOf(START), j=raw.indexOf(END);
+    if(i<0||j<0){alert("File ini belum punya blok config MOCHI_CONFIG. Pastikan pilih index-minimal.html yang benar.");return;}
+    var block=raw.slice(i+START.length,j);
+    var t=block.replace(/window\.MOCHI_CONFIG\s*=\s*/,"").trim().replace(/;$/,"").trim();
+    try{cfg=JSON.parse(t);}catch(err){alert("Gagal baca config: "+err.message);return;}
+    $("fname").textContent="✓ "+fileName+" dimuat.";
+    $("form").style.display="block";
+    $("loadPanel").style.display="none";
+    render();
+    window.scrollTo(0,0);
+  };
+  rd.readAsText(f);
+}
+
+/* ---------- render ---------- */
+function render(){
+  cfg.promo=cfg.promo||{on:true,percent:20,label:"Promo hari ini",mode:"midnight",resetHours:24};
+  cfg.hero=cfg.hero||{line1:"",line2:"",copy:""};
+  cfg.theme=cfg.theme||{accent:"#5A48CF"};
+  cfg.products=cfg.products||{};
+  photos={};
+
+  $("p_on").checked=!!cfg.promo.on;
+  $("p_pct").value=cfg.promo.percent||20;
+  $("p_label").value=cfg.promo.label||"Promo hari ini";
+  promoMode=(cfg.promo.mode==="midnight")?"midnight":((cfg.promo.resetHours==72)?"rolling72":"custom");
+  $("p_hours").value=cfg.promo.resetHours||24;
+  paintMode();
+
+  $("h_l1").value=cfg.hero.line1||"";
+  $("h_l2").value=cfg.hero.line2||"";
+  $("h_copy").value=cfg.hero.copy||"";
+  syncHeroPreview();
+
+  var ac=cfg.theme.accent||"#5A48CF";
+  $("t_accent").value=ac; $("t_accent_hex").value=ac;
+  applyAccent(ac);
+  var sw=$("swatches"); sw.innerHTML="";
+  SWATCH.forEach(function(c){var b=document.createElement("button");b.style.background=c;
+    b.onclick=function(){$("t_accent").value=c;$("t_accent_hex").value=c;applyAccent(c);};sw.appendChild(b);});
+
+  $("wa").value=cfg.wa||"";
+
+  var box=$("prods"); box.innerHTML="";
+  Object.keys(cfg.products).forEach(function(id){
+    var p=cfg.products[id];
+    photos[id]=p.img||"";
+    var d=document.createElement("div"); d.className="prod"; d.dataset.id=id;
+    var opts=CATS.map(function(c){return '<option value="'+c[0]+'"'+(p.cat===c[0]?" selected":"")+'>'+c[1]+'</option>';}).join("");
+    d.innerHTML=
+      '<div class="ph"><b>'+esc(p.name||id)+'</b><span class="pid">'+id+'</span></div>'+
+      '<div class="photoRow"><div class="thumb" data-thumb></div>'+
+      '<div class="upwrap"><label class="upbtn">📷 Ganti foto<input type="file" class="f-img" accept="image/*"></label>'+
+      '<button type="button" class="rmimg">Hapus</button><div class="imgnote"></div></div></div>'+
+      '<label>Nama</label><input type="text" class="f-name" value="'+esc(p.name)+'">'+
+      '<div class="row"><div><label>Harga (Rp)</label><input type="number" class="f-price" value="'+(p.price||0)+'"></div>'+
+      '<div><label>Kategori / badge</label><select class="f-cat">'+opts+'</select></div></div>'+
+      '<div class="pricePrev"></div>'+
+      '<label>Deskripsi</label><textarea class="f-desc">'+esc(p.desc)+'</textarea>';
+    box.appendChild(d);
+    var nameEl=d.querySelector(".f-name"), priceEl=d.querySelector(".f-price");
+    nameEl.addEventListener("input",function(){d.querySelector(".ph b").textContent=nameEl.value||id;});
+    priceEl.addEventListener("input",paintPrices);
+    paintThumb(d,id);
+    d.querySelector(".f-img").addEventListener("change",function(){
+      if(!this.files[0])return;
+      compress(this.files[0],function(durl){photos[id]=durl;paintThumb(d,id);});
+    });
+    d.querySelector(".rmimg").addEventListener("click",function(){photos[id]="";paintThumb(d,id);});
+  });
+  paintPrices();
+}
+
+function paintPrices(){
+  var pct=parseFloat($("p_pct").value)||0, on=$("p_on").checked;
+  document.querySelectorAll(".prod").forEach(function(d){
+    var price=parseInt(d.querySelector(".f-price").value,10)||0;
+    var el=d.querySelector(".pricePrev"), was=on?wasPrice(price,pct):0;
+    el.innerHTML = was ? ('<s>'+rupiah(was)+'</s><span class="now">'+rupiah(price)+'</span><span class="off">-'+pct+'%</span>')
+                       : ('<span class="now">'+rupiah(price)+'</span>');
+  });
+}
+
+function paintThumb(d,id){
+  var t=d.querySelector("[data-thumb]"),note=d.querySelector(".imgnote"),rm=d.querySelector(".rmimg");
+  var v=photos[id];
+  if(v && v.indexOf("data:")===0){
+    t.style.backgroundImage="url("+v+")"; t.textContent="";
+    note.textContent="Foto siap ("+kb(v)+" KB)"; rm.style.display="inline";
+  }else{
+    t.style.backgroundImage="none"; t.textContent="Foto bawaan situs";
+    note.textContent="Belum diganti lewat editor"; rm.style.display="none";
+  }
+}
+
+/* ---------- promo mode ---------- */
+$("p_mode").querySelectorAll("button").forEach(function(b){
+  b.onclick=function(){promoMode=b.dataset.m;paintMode();paintPrices();};
+});
+function paintMode(){
+  $("p_mode").querySelectorAll("button").forEach(function(b){b.classList.toggle("on",b.dataset.m===promoMode);});
+  $("p_custom").style.display = promoMode==="custom" ? "block" : "none";
+  var t={midnight:"Diskon reset tiap tengah malam. Cocok untuk \"fresh tiap hari\", urgensi paling kuat, dan diskon nggak pernah hilang.",
+         rolling72:"Diskon reset tiap 3 hari. Countdown tampil \"X hari : jam : menit\".",
+         custom:"Diskon reset tiap sekian jam sesuai input."}[promoMode];
+  $("p_explain").textContent=t;
+}
+$("p_on").addEventListener("change",function(){$("promoFields").style.opacity=this.checked?"1":".5";paintPrices();});
+$("p_pct").addEventListener("input",function(){paintPrices();syncHeroPreview();});
+
+/* ---------- hero preview ---------- */
+["h_l1","h_l2","h_copy"].forEach(function(id){$(id).addEventListener("input",syncHeroPreview);});
+function syncHeroPreview(){$("pv1").textContent=$("h_l1").value;$("pv2").textContent=$("h_l2").value;$("pvc").textContent=$("h_copy").value;}
+
+/* ---------- accent ---------- */
+function applyAccent(c){document.documentElement.style.setProperty("--accent",c);}
+$("t_accent").addEventListener("input",function(){$("t_accent_hex").value=this.value;applyAccent(this.value);});
+$("t_accent_hex").addEventListener("input",function(){var v=this.value.trim();if(/^#?[0-9a-fA-F]{6}$/.test(v)){if(v[0]!=="#")v="#"+v;$("t_accent").value=v;applyAccent(v);}});
+
+/* ---------- save ---------- */
+$("save").addEventListener("click",function(){
+  cfg.wa=$("wa").value.trim();
+  cfg.theme={accent:$("t_accent").value};
+  cfg.hero={line1:$("h_l1").value,line2:$("h_l2").value,copy:$("h_copy").value};
+  var mode=(promoMode==="midnight")?"midnight":"rolling";
+  var hours=(promoMode==="midnight")?24:(promoMode==="rolling72")?72:(parseInt($("p_hours").value,10)||24);
+  cfg.promo={on:$("p_on").checked,percent:parseInt($("p_pct").value,10)||20,
+             label:$("p_label").value||"Promo hari ini",mode:mode,resetHours:hours};
+  document.querySelectorAll(".prod").forEach(function(d){
+    var id=d.dataset.id, p=cfg.products[id]||{};
+    p.name=d.querySelector(".f-name").value;
+    p.price=parseInt(d.querySelector(".f-price").value,10)||0;
+    p.cat=d.querySelector(".f-cat").value;
+    p.desc=d.querySelector(".f-desc").value;
+    if(photos[id] && photos[id].indexOf("data:")===0){p.img=photos[id];}
+    else if("img" in p){delete p.img;}
+    cfg.products[id]=p;
+  });
+  var newBlock=START+"\nwindow.MOCHI_CONFIG = "+JSON.stringify(cfg,null,2)+";\n"+END;
+  var i=raw.indexOf(START), j=raw.indexOf(END)+END.length;
+  var out=raw.slice(0,i)+newBlock+raw.slice(j);
+  var blob=new Blob([out],{type:"text/html"});
+  var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=fileName; a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);},1500);
+  raw=out;
+  var m=$("okmsg"); m.style.display="block"; m.scrollIntoView({behavior:"smooth",block:"center"});
+});
+$("reload").addEventListener("click",function(){location.reload();});
+</script>
+</body>
+</html>
