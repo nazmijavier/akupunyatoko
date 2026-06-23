@@ -83,6 +83,28 @@
   .btn-ghost{background:#fff;color:var(--ink);border:1px solid var(--line);flex:none;padding:14px 16px}
   .ok-msg{display:none;position:fixed;left:16px;right:16px;bottom:76px;max-width:748px;margin:0 auto;z-index:31;background:#eafaf0;border:1px solid #bfe9cf;color:#157a44;border-radius:10px;padding:10px 12px;font-size:13px;font-weight:700}
   .dim{opacity:.4;pointer-events:none}
+  /* availability calendar */
+  .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .cal-title{font-size:16px;font-weight:800}
+  .cal-nav{display:flex;gap:8px}
+  .cal-nav button{width:36px;height:36px;border-radius:9px;border:1px solid var(--line);background:#fffdf8;font-size:18px;font-family:inherit;color:var(--ink);cursor:pointer}
+  .cal-nav button:disabled{opacity:.35;cursor:not-allowed}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+  .cal-dow{text-align:center;font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;padding-bottom:4px}
+  .cal-cell{aspect-ratio:1/1;border:1px solid var(--line);border-radius:10px;background:#fffdf8;font-family:inherit;font-size:14px;font-weight:700;color:var(--ink);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0;transition:.12s}
+  .cal-cell .ic{font-size:11px;line-height:1}
+  .cal-cell.empty{border:0;background:none;cursor:default}
+  .cal-cell.past{opacity:.32;cursor:not-allowed;background:#f3f0e8}
+  .cal-cell.av{border-color:#bfe6cc;background:#f1faf4}.cal-cell.av .ic{color:#1faa59}
+  .cal-cell.limited{border-color:#f0c879;background:#fff7e8}.cal-cell.limited .ic{color:#E8902E}
+  .cal-cell.full{border-color:#f0c2c2;background:#fdeeee}.cal-cell.full .ic{color:#d23}
+  .cal-cell:not(.empty):not(.past):hover{box-shadow:0 0 0 2px var(--accent)}
+  .cal-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;font-size:12.5px;font-weight:700;color:var(--muted)}
+  .cal-legend span{display:inline-flex;align-items:center;gap:6px}
+  .cal-legend i{font-style:normal}
+  .cal-legend .l-av{color:#1faa59}.cal-legend .l-lim{color:#E8902E}.cal-legend .l-full{color:#d23}
+  .cal-actions{margin-top:12px}
+  .cal-clear{background:none;border:0;color:#d23;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;padding:0}
 </style>
 </head>
 <body>
@@ -109,6 +131,7 @@
       <button data-t="hero">✏️ Hero</button>
       <button data-t="look">🎨 Warna</button>
       <button data-t="box">📦 Box</button>
+      <button data-t="dates">📅 Tanggal</button>
       <button data-t="text">📝 Teks</button>
     </div>
 
@@ -190,6 +213,25 @@
       </div>
     </div>
 
+    <!-- TANGGAL -->
+    <div class="tabpane" data-pane="dates">
+      <div class="panel">
+        <h2>Ketersediaan Tanggal</h2>
+        <p class="hint" style="margin-top:0">Klik tanggal untuk ganti status: <b>Tersedia</b> → <b>Terbatas</b> → <b>Penuh</b> → balik lagi. Tanggal <b>Penuh</b> nggak bisa dipilih pembeli di situs. Tanggal yang dilewatin = tetap tersedia.</p>
+        <div class="cal-head">
+          <span class="cal-title" id="calTitle"></span>
+          <div class="cal-nav"><button type="button" id="calPrev">&lsaquo;</button><button type="button" id="calNext">&rsaquo;</button></div>
+        </div>
+        <div class="cal-grid" id="cal"></div>
+        <div class="cal-legend">
+          <span><i class="l-av">●</i> Tersedia</span>
+          <span><i class="l-lim">●</i> Terbatas</span>
+          <span><i class="l-full">●</i> Penuh</span>
+        </div>
+        <div class="cal-actions"><button type="button" class="cal-clear" id="calClear">Reset semua tanggal jadi tersedia</button></div>
+      </div>
+    </div>
+
     <div class="tabpane" data-pane="text">
       <div class="panel">
         <h2>Teks Lain di Situs</h2>
@@ -264,6 +306,7 @@ function render(){
   $("t_rating").value=cfg.text.ratingText||"";$("t_bulktitle").value=cfg.text.bulkTitle||"";
   $("t_bulksub").value=cfg.text.bulkSub||"";$("t_paynote").value=cfg.text.payNote||"";
   $("b_on").checked=(cfg.boxesOn!==false);paintBoxArea();
+  cfg.availability=cfg.availability||{};calMonth=new Date();renderCalendar();
   renderProducts();renderBoxes();
 }
 
@@ -324,6 +367,47 @@ function paintBoxArea(){var on=$("b_on").checked;$("boxArea").classList.toggle("
 
 $("o_on").addEventListener("change",paintOrders);
 function paintOrders(){var on=$("o_on").checked;$("o_explain").textContent=on?"Pembeli bisa pesan seperti biasa.":"Pesanan ditutup: tombol Pesan dimatikan & banner \"ditutup sementara\" muncul di situs.";}
+
+// ===== Kalender ketersediaan =====
+var CAL_DOW=["Min","Sen","Sel","Rab","Kam","Jum","Sab"];
+var CAL_MON=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+var calMonth=new Date();
+function calYmd(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+function renderCalendar(){
+  cfg.availability=cfg.availability||{};
+  var grid=$("cal");if(!grid)return;grid.innerHTML="";
+  var today=new Date();today.setHours(0,0,0,0);
+  var curMonthStart=new Date(today.getFullYear(),today.getMonth(),1);
+  if(calMonth<curMonthStart)calMonth=new Date(curMonthStart);
+  calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth(),1);
+  $("calTitle").textContent=CAL_MON[calMonth.getMonth()]+" "+calMonth.getFullYear();
+  $("calPrev").disabled=(calMonth.getFullYear()===curMonthStart.getFullYear()&&calMonth.getMonth()===curMonthStart.getMonth());
+  CAL_DOW.forEach(function(w){var h=document.createElement("div");h.className="cal-dow";h.textContent=w;grid.appendChild(h);});
+  var first=new Date(calMonth.getFullYear(),calMonth.getMonth(),1);
+  var lead=first.getDay();
+  var days=new Date(calMonth.getFullYear(),calMonth.getMonth()+1,0).getDate();
+  for(var i=0;i<lead;i++){var e=document.createElement("div");e.className="cal-cell empty";grid.appendChild(e);}
+  for(var dn=1;dn<=days;dn++){
+    var d=new Date(calMonth.getFullYear(),calMonth.getMonth(),dn);
+    var ymd=calYmd(d);
+    var past=d<today;
+    var st=cfg.availability[ymd]||"available";
+    var cell=document.createElement("button");cell.type="button";
+    cell.className="cal-cell "+(past?"past":(st==="full"?"full":(st==="limited"?"limited":"av")));
+    var ic=past?"":(st==="full"?"✕":(st==="limited"?"⚠":"✓"));
+    cell.innerHTML='<span class="dnum">'+dn+'</span><span class="ic">'+ic+'</span>';
+    if(!past){cell.dataset.ymd=ymd;cell.addEventListener("click",function(){
+      var k=this.dataset.ymd,cur=cfg.availability[k]||"available";
+      var nx=cur==="available"?"limited":(cur==="limited"?"full":"available");
+      if(nx==="available")delete cfg.availability[k];else cfg.availability[k]=nx;
+      renderCalendar();
+    });}
+    grid.appendChild(cell);
+  }
+}
+$("calPrev").addEventListener("click",function(){calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()-1,1);renderCalendar();});
+$("calNext").addEventListener("click",function(){calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()+1,1);renderCalendar();});
+$("calClear").addEventListener("click",function(){if(confirm("Reset semua tanggal jadi tersedia?")){cfg.availability={};renderCalendar();}});
 
 $("p_mode").querySelectorAll("button").forEach(function(b){b.onclick=function(){promoMode=b.dataset.m;paintMode();paintPrices();};});
 function paintMode(){$("p_mode").querySelectorAll("button").forEach(function(b){b.classList.toggle("on",b.dataset.m===promoMode);});
