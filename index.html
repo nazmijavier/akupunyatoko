@@ -361,7 +361,7 @@ function render(){
   $("b_on").checked=(cfg.boxesOn!==false);paintBoxArea();
   cfg.availability=cfg.availability||{};cfg.availabilityWeekly=cfg.availabilityWeekly||{};calMonth=new Date();renderWeekly();renderCalendar();
   var DL=cfg.delivery||{};if($("dl_grab"))$("dl_grab").value=DL.grabfood||"";if($("dl_go"))$("dl_go").value=DL.gofood||"";if($("dl_shopee"))$("dl_shopee").value=DL.shopeefood||"";
-  testiData=(Array.isArray(cfg.testimonials)?cfg.testimonials:[]).map(function(t){return {type:(t.video?"video":"foto"),img:t.img||"",ig:t.ig||"",video:t.video||""};});renderTestis();
+  testiData=(Array.isArray(cfg.testimonials)?cfg.testimonials:[]).map(function(t){return {type:((t.video||t.vid)?"video":"foto"),img:t.img||"",ig:t.ig||"",video:t.video||"",vid:t.vid||""};});renderTestis();
   renderProducts();renderBoxes();
 }
 
@@ -505,22 +505,35 @@ function compressTesti(file,cb){
   im.onerror=function(){alert("Foto gagal dibaca.");};
   im.src=URL.createObjectURL(file);
 }
+function readVideo(file,cb){
+  if(file.size>15*1024*1024 && !confirm("Video "+(file.size/1048576).toFixed(1)+"MB cukup besar dan bisa bikin situs lambat. Saran: pakai klip pendek (<10 dtk) yang sudah dikompres. Tetap pakai?")) return;
+  var rd=new FileReader();
+  rd.onload=function(){ cb(rd.result); };
+  rd.onerror=function(){ alert("Video gagal dibaca."); };
+  rd.readAsDataURL(file);
+}
 function renderTestis(){
   var box=$("testis"); if(!box) return; box.innerHTML="";
   if(!testiData.length){ box.innerHTML='<p class="hint" style="margin:0 0 6px">Belum ada testimoni. Klik tombol di bawah untuk menambah.</p>'; }
   testiData.forEach(function(t,i){
     var isVid=(t.type==="video");
     var row=document.createElement("div"); row.className="testi-row";
-    var thumbInner = t.img ? "" : (isVid?"▶<br>Video":"Foto<br>9:16");
+    var thumbInner = t.img ? "" : (t.vid?"🎬<br>Video":(isVid?"▶<br>Video":"Foto<br>9:16"));
     var upLabel = isVid ? "🖼️ "+(t.img?"Ganti":"Upload")+" poster <small>(opsional)</small>" : "📷 "+(t.img?"Ganti":"Upload")+" foto";
-    var vidField = isVid ? ('<label style="margin-top:8px">Link Reels / TikTok</label><input type="text" class="t-vid" value="'+esc(t.video||"")+'" placeholder="https://www.tiktok.com/@.../video/...  atau  https://instagram.com/reel/...">') : "";
+    var vidUp = isVid ? (
+        '<label style="margin-top:8px">Upload video <small>(autoplay di carousel, tanpa suara, mp4 pendek)</small></label>'+
+        '<div class="testi-up"><label class="upbtn">🎬 '+(t.vid?"Ganti":"Upload")+' video<input type="file" class="t-vidfile" accept="video/*"></label>'+
+        '<span class="t-vidstat hint" style="margin:0;font-weight:700">'+(t.vid?"✓ video tersimpan":"belum ada video")+'</span></div>'+
+        '<label style="margin-top:10px">atau Link Reels / TikTok <small>(diputar pas diklik, ada suara)</small></label>'+
+        '<input type="text" class="t-vid" value="'+esc(t.video||"")+'" placeholder="https://www.tiktok.com/...  /  https://instagram.com/reel/...">'
+      ) : "";
     row.innerHTML='<div class="testi-thumb" data-th>'+thumbInner+'</div>'+
       '<div class="testi-fields">'+
         '<div class="seg t-type">'+
           '<button type="button" data-ty="foto"'+(isVid?"":' class="on"')+'>Foto</button>'+
           '<button type="button" data-ty="video"'+(isVid?' class="on"':"")+'>Video</button>'+
         '</div>'+
-        vidField+
+        vidUp+
         '<label style="margin-top:8px">Username IG <small>(opsional)</small></label>'+
         '<input type="text" class="t-ig" value="'+esc(t.ig||"")+'" placeholder="@username">'+
         '<div class="testi-up"><label class="upbtn">'+upLabel+'<input type="file" class="t-img" accept="image/*"></label>'+
@@ -530,7 +543,11 @@ function renderTestis(){
     var thumb=row.querySelector("[data-th]");
     if(t.img){ thumb.style.backgroundImage="url('"+t.img+"')"; thumb.innerHTML=""; }
     row.querySelectorAll(".t-type button").forEach(function(b){ b.addEventListener("click",function(){ testiData[i].type=this.dataset.ty; renderTestis(); }); });
-    if(isVid){ var vf=row.querySelector(".t-vid"); if(vf) vf.addEventListener("input",function(){ testiData[i].video=this.value; }); }
+    if(isVid){
+      var vf=row.querySelector(".t-vid"); if(vf) vf.addEventListener("input",function(){ testiData[i].video=this.value; });
+      var vfile=row.querySelector(".t-vidfile"), vstat=row.querySelector(".t-vidstat");
+      if(vfile) vfile.addEventListener("change",function(){ if(this.files[0]) readVideo(this.files[0],function(u){ testiData[i].vid=u; if(vstat){vstat.textContent="✓ video tersimpan";} if(!t.img){ thumb.innerHTML="🎬<br>Video"; } }); });
+    }
     row.querySelector(".t-ig").addEventListener("input",function(){ testiData[i].ig=this.value; });
     row.querySelector(".t-img").addEventListener("change",function(){ if(this.files[0]) compressTesti(this.files[0],function(u){ testiData[i].img=u; thumb.style.backgroundImage="url('"+u+"')"; thumb.innerHTML=""; }); });
     row.querySelector(".testi-rm").addEventListener("click",function(){ testiData.splice(i,1); renderTestis(); });
@@ -560,7 +577,7 @@ $("save").addEventListener("click",function(){
   var hours=(promoMode==="midnight")?24:(promoMode==="rolling72")?72:(parseInt($("p_hours").value,10)||24);
   cfg.promo={on:$("p_on").checked,percent:parseInt($("p_pct").value,10)||20,label:$("p_label").value||"Promo hari ini",mode:mode,resetHours:hours};
   cfg.boxesOn=$("b_on").checked;cfg.ordersOn=$("o_on").checked;
-  cfg.testimonials=testiData.filter(function(t){return (t.type==="video")?(t.video&&t.video.trim()):t.img;}).map(function(t){var o={ig:(t.ig||"").trim()};if(t.type==="video"&&t.video&&t.video.trim())o.video=t.video.trim();if(t.img)o.img=t.img;return o;});
+  cfg.testimonials=testiData.filter(function(t){return (t.type==="video")?(t.vid||(t.video&&t.video.trim())||t.img):t.img;}).map(function(t){var o={ig:(t.ig||"").trim()};if(t.type==="video"){if(t.vid)o.vid=t.vid;if(t.video&&t.video.trim())o.video=t.video.trim();}if(t.img)o.img=t.img;return o;});
   cfg.delivery={grabfood:($("dl_grab")?$("dl_grab").value.trim():""),gofood:($("dl_go")?$("dl_go").value.trim():""),shopeefood:($("dl_shopee")?$("dl_shopee").value.trim():"")};
   document.querySelectorAll(".prod").forEach(function(d){var id=d.dataset.id,p=cfg.products[id]||{};
     p.name=d.querySelector(".f-name").value;p.price=parseInt(d.querySelector(".f-price").value,10)||0;
