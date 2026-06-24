@@ -42,6 +42,8 @@
   .ph .ph-r{display:flex;align-items:center;gap:8px}
   .pid{font-size:11px;font-weight:700;color:var(--muted);background:var(--soft);padding:3px 8px;border-radius:999px}
   .pid.new{background:#e7fbef;color:#157a44}
+  .ptype{font-size:11px;font-weight:800;color:var(--accent);background:#efeafc;padding:3px 8px;border-radius:999px}
+  .ptype.dcc{color:#9a5a1e;background:#fbeeda}
   .pricePrev{font-size:13px;font-weight:700;margin-top:6px}
   .pricePrev s{color:var(--muted);font-weight:600;margin-right:6px}
   .pricePrev .now{color:var(--accent)}
@@ -105,6 +107,13 @@
   .cal-legend .l-av{color:#1faa59}.cal-legend .l-lim{color:#E8902E}.cal-legend .l-full{color:#d23}
   .cal-actions{margin-top:12px}
   .cal-clear{background:none;border:0;color:#d23;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;padding:0}
+  /* testimoni editor */
+  .testi-row{display:flex;gap:14px;align-items:flex-start;border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:12px;background:#fffdf8}
+  .testi-thumb{flex:none;width:72px;aspect-ratio:9/16;border-radius:10px;background:#efeafc center/cover no-repeat;border:1px dashed var(--line);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--muted);text-align:center;overflow:hidden}
+  .testi-fields{flex:1;min-width:0}
+  .testi-fields label{margin-top:0}
+  .testi-up{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+  .testi-rm{background:none;border:0;color:#d23;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;padding:4px 0}
 </style>
 </head>
 <body>
@@ -132,6 +141,7 @@
       <button data-t="look">🎨 Warna</button>
       <button data-t="box">📦 Box</button>
       <button data-t="dates">📅 Tanggal</button>
+      <button data-t="testi">📸 Testimoni</button>
       <button data-t="text">📝 Teks</button>
     </div>
 
@@ -232,6 +242,18 @@
       </div>
     </div>
 
+    <!-- TESTIMONI -->
+    <div class="tabpane" data-pane="testi">
+      <div class="panel">
+        <h2>Testimoni Pelanggan</h2>
+        <p class="hint" style="margin-top:0">Foto pelanggan yang tampil di carousel paling bawah halaman Pesan. Foto otomatis dipotong jadi <b>9:16 (potrait)</b> &amp; dikompres. Username IG opsional, kosongkan kalau nggak mau ditampilkan.</p>
+        <div id="testis"></div>
+        <div class="row" style="margin-top:4px">
+          <button type="button" class="addbtn" id="addTesti">+ Tambah testimoni</button>
+        </div>
+      </div>
+    </div>
+
     <div class="tabpane" data-pane="text">
       <div class="panel">
         <h2>Teks Lain di Situs</h2>
@@ -307,6 +329,7 @@ function render(){
   $("t_bulksub").value=cfg.text.bulkSub||"";$("t_paynote").value=cfg.text.payNote||"";
   $("b_on").checked=(cfg.boxesOn!==false);paintBoxArea();
   cfg.availability=cfg.availability||{};calMonth=new Date();renderCalendar();
+  testiData=(Array.isArray(cfg.testimonials)?cfg.testimonials:[]).map(function(t){return {img:t.img||"",ig:t.ig||""};});renderTestis();
   renderProducts();renderBoxes();
 }
 
@@ -317,11 +340,13 @@ function renderProducts(){
     var d=document.createElement("div");d.className="prod"+(p.soldOut?" sold":"");d.dataset.id=id;
     var opts=CATS.map(function(c){return '<option value="'+c[0]+'"'+(p.cat===c[0]?" selected":"")+'>'+c[1]+'</option>';}).join("");
     var isNew=addedIds[id];
+    var isDubai=/^dcc/.test(id)||/^satuan_/.test(id)||p.type==="dubai"||("short" in p);
     d.innerHTML='<div class="ph"><div style="display:flex;align-items:center;gap:8px"><b>'+esc(p.name||id)+'</b><span class="soldtag">Habis</span></div>'+
-      '<div class="ph-r"><span class="pid'+(isNew?' new':'')+'">'+(isNew?'baru':id)+'</span>'+(isNew?'<button type="button" class="rmprod">Hapus</button>':'')+'</div></div>'+
+      '<div class="ph-r"><span class="ptype'+(isDubai?' dcc':'')+'">'+(isDubai?'Dubai':'Mochi')+'</span><span class="pid'+(isNew?' new':'')+'">'+(isNew?'baru':id)+'</span>'+(isNew?'<button type="button" class="rmprod">Hapus</button>':'')+'</div></div>'+
       '<label class="switch red"><input type="checkbox" class="f-sold"'+(p.soldOut?' checked':'')+'><span class="track"></span> Tandai habis</label>'+
       '<div class="photoRow"><div class="thumb" data-thumb></div><div class="upwrap"><label class="upbtn">📷 Ganti foto<input type="file" class="f-img" accept="image/*"></label><button type="button" class="rmimg">Hapus</button><div class="imgnote"></div></div></div>'+
-      '<label>Nama</label><input type="text" class="f-name" value="'+esc(p.name)+'">'+
+      (isDubai?'<label>Teks di kartu <small>(yang tampil di situs, mis. Small / Big)</small></label><input type="text" class="f-short" value="'+esc(p.short||"")+'">':'')+
+      '<label>Nama'+(isDubai?' lengkap <small>(dipakai di chat WhatsApp)</small>':'')+'</label><input type="text" class="f-name" value="'+esc(p.name)+'">'+
       '<label>Deskripsi singkat <small>(tampil di bawah judul)</small></label><input type="text" class="f-tagline" value="'+esc(p.tagline)+'" placeholder="Isi cheesecake creamy + selai stroberi">'+
       '<div class="row"><div><label>Harga (Rp)</label><input type="number" class="f-price" value="'+(p.price||0)+'"></div>'+
       '<div><label>Kategori / badge</label><select class="f-cat">'+opts+'</select></div></div>'+
@@ -409,6 +434,45 @@ $("calPrev").addEventListener("click",function(){calMonth=new Date(calMonth.getF
 $("calNext").addEventListener("click",function(){calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()+1,1);renderCalendar();});
 $("calClear").addEventListener("click",function(){if(confirm("Reset semua tanggal jadi tersedia?")){cfg.availability={};renderCalendar();}});
 
+// ===== Testimoni =====
+var testiData=[];
+function compressTesti(file,cb){
+  var im=new Image();
+  im.onload=function(){
+    var TW=480, R=16/9, w=im.width, h=im.height, sx=0,sy=0,sw=w,sh=h;
+    var th=Math.round(w*R);
+    if(th<=h){ sy=Math.round((h-th)/2); sh=th; }
+    else { var tw=Math.round(h/R); sx=Math.round((w-tw)/2); sw=tw; }
+    var nh=Math.round(TW*R);
+    var c=document.createElement("canvas"); c.width=TW; c.height=nh;
+    c.getContext("2d").drawImage(im, sx,sy,sw,sh, 0,0,TW,nh);
+    cb(c.toDataURL("image/jpeg",0.72));
+  };
+  im.onerror=function(){alert("Foto gagal dibaca.");};
+  im.src=URL.createObjectURL(file);
+}
+function renderTestis(){
+  var box=$("testis"); if(!box) return; box.innerHTML="";
+  if(!testiData.length){ box.innerHTML='<p class="hint" style="margin:0 0 6px">Belum ada testimoni. Klik tombol di bawah untuk menambah.</p>'; }
+  testiData.forEach(function(t,i){
+    var row=document.createElement("div"); row.className="testi-row";
+    row.innerHTML='<div class="testi-thumb" data-th>'+(t.img?"":"Foto<br>9:16")+'</div>'+
+      '<div class="testi-fields">'+
+        '<label>Username IG <small>(opsional)</small></label>'+
+        '<input type="text" class="t-ig" value="'+esc(t.ig||"")+'" placeholder="@username">'+
+        '<div class="testi-up"><label class="upbtn">📷 '+(t.img?"Ganti":"Upload")+' foto<input type="file" class="t-img" accept="image/*"></label>'+
+        '<button type="button" class="testi-rm">Hapus</button></div>'+
+      '</div>';
+    box.appendChild(row);
+    var thumb=row.querySelector("[data-th]");
+    if(t.img){ thumb.style.backgroundImage="url('"+t.img+"')"; thumb.innerHTML=""; }
+    row.querySelector(".t-ig").addEventListener("input",function(){ testiData[i].ig=this.value; });
+    row.querySelector(".t-img").addEventListener("change",function(){ if(this.files[0]) compressTesti(this.files[0],function(u){ testiData[i].img=u; thumb.style.backgroundImage="url('"+u+"')"; thumb.innerHTML=""; }); });
+    row.querySelector(".testi-rm").addEventListener("click",function(){ testiData.splice(i,1); renderTestis(); });
+  });
+}
+$("addTesti").addEventListener("click",function(){ testiData.push({img:"",ig:""}); renderTestis(); });
+
 $("p_mode").querySelectorAll("button").forEach(function(b){b.onclick=function(){promoMode=b.dataset.m;paintMode();paintPrices();};});
 function paintMode(){$("p_mode").querySelectorAll("button").forEach(function(b){b.classList.toggle("on",b.dataset.m===promoMode);});
   $("p_custom").style.display=promoMode==="custom"?"block":"none";
@@ -431,9 +495,11 @@ $("save").addEventListener("click",function(){
   var hours=(promoMode==="midnight")?24:(promoMode==="rolling72")?72:(parseInt($("p_hours").value,10)||24);
   cfg.promo={on:$("p_on").checked,percent:parseInt($("p_pct").value,10)||20,label:$("p_label").value||"Promo hari ini",mode:mode,resetHours:hours};
   cfg.boxesOn=$("b_on").checked;cfg.ordersOn=$("o_on").checked;
+  cfg.testimonials=testiData.filter(function(t){return t.img;}).map(function(t){return {img:t.img,ig:(t.ig||"").trim()};});
   document.querySelectorAll(".prod").forEach(function(d){var id=d.dataset.id,p=cfg.products[id]||{};
     p.name=d.querySelector(".f-name").value;p.price=parseInt(d.querySelector(".f-price").value,10)||0;
     p.cat=d.querySelector(".f-cat").value;p.desc=d.querySelector(".f-desc").value;p.tagline=d.querySelector(".f-tagline").value;p.soldOut=d.querySelector(".f-sold").checked;
+    var sh=d.querySelector(".f-short");if(sh)p.short=sh.value;
     if(photos[id]&&photos[id].indexOf("data:")===0)p.img=photos[id];else if("img" in p)delete p.img;
     cfg.products[id]=p;});
   document.querySelectorAll(".boxcard").forEach(function(d){var b=cfg.boxes[+d.dataset.idx];if(!b)return;
