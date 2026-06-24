@@ -92,6 +92,15 @@
   .cal-nav button{width:36px;height:36px;border-radius:9px;border:1px solid var(--line);background:#fffdf8;font-size:18px;font-family:inherit;color:var(--ink);cursor:pointer}
   .cal-nav button:disabled{opacity:.35;cursor:not-allowed}
   .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+  .wk-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+  .wk-cell{border:1px solid var(--line);border-radius:10px;padding:9px 2px;background:#fff;cursor:pointer;font-family:inherit;text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px}
+  .wk-cell .wd{font-size:11px;font-weight:800;color:var(--muted)}
+  .wk-cell .ic{font-size:13px;font-weight:800}
+  .wk-cell.av{background:#eaf8ef;border-color:#bfe6cd}.wk-cell.av .ic{color:#1c9d54}
+  .wk-cell.limited{background:#fff5e2;border-color:#f3d79a}.wk-cell.limited .ic{color:#c98a12}
+  .wk-cell.full{background:#fdecec;border-color:#f3b9b9}.wk-cell.full .ic{color:#d23}
+  .cal-cell.ovr{box-shadow:inset 0 0 0 2px rgba(43,35,80,.35)}
+  .cal-cell.ovr .dnum::after{content:"•";margin-left:2px;color:var(--accent)}
   .cal-dow{text-align:center;font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;padding-bottom:4px}
   .cal-cell{aspect-ratio:1/1;border:1px solid var(--line);border-radius:10px;background:#fffdf8;font-family:inherit;font-size:14px;font-weight:700;color:var(--ink);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0;transition:.12s}
   .cal-cell .ic{font-size:11px;line-height:1}
@@ -142,6 +151,7 @@
       <button data-t="box">📦 Box</button>
       <button data-t="dates">📅 Tanggal</button>
       <button data-t="testi">📸 Testimoni</button>
+      <button data-t="deliv">🛵 Antar</button>
       <button data-t="text">📝 Teks</button>
     </div>
 
@@ -226,8 +236,18 @@
     <!-- TANGGAL -->
     <div class="tabpane" data-pane="dates">
       <div class="panel">
+        <h2>Aturan Mingguan</h2>
+        <p class="hint" style="margin-top:0">Klik hari untuk set status default tiap minggu (Tersedia → Perlu konfirmasi → Penuh). Berlaku otomatis ke semua tanggal yang belum kamu atur manual di kalender bawah.</p>
+        <div class="wk-grid" id="wkGrid"></div>
+        <div class="cal-legend">
+          <span><i class="l-av">●</i> Tersedia</span>
+          <span><i class="l-lim">●</i> Perlu konfirmasi</span>
+          <span><i class="l-full">●</i> Penuh</span>
+        </div>
+      </div>
+      <div class="panel">
         <h2>Ketersediaan Tanggal</h2>
-        <p class="hint" style="margin-top:0">Klik tanggal untuk ganti status: <b>Tersedia</b> → <b>Terbatas</b> → <b>Penuh</b> → balik lagi. Tanggal <b>Penuh</b> nggak bisa dipilih pembeli di situs. Tanggal yang dilewatin = tetap tersedia.</p>
+        <p class="hint" style="margin-top:0">Klik tanggal untuk override status tertentu: <b>Tersedia</b> → <b>Perlu konfirmasi</b> → <b>Penuh</b> → balik ngikut aturan mingguan. Tanggal <b>Penuh</b> nggak bisa dipilih pembeli. Tanggal ber-titik = di-override manual.</p>
         <div class="cal-head">
           <span class="cal-title" id="calTitle"></span>
           <div class="cal-nav"><button type="button" id="calPrev">&lsaquo;</button><button type="button" id="calNext">&rsaquo;</button></div>
@@ -235,7 +255,7 @@
         <div class="cal-grid" id="cal"></div>
         <div class="cal-legend">
           <span><i class="l-av">●</i> Tersedia</span>
-          <span><i class="l-lim">●</i> Terbatas</span>
+          <span><i class="l-lim">●</i> Perlu konfirmasi</span>
           <span><i class="l-full">●</i> Penuh</span>
         </div>
         <div class="cal-actions"><button type="button" class="cal-clear" id="calClear">Reset semua tanggal jadi tersedia</button></div>
@@ -251,6 +271,17 @@
         <div class="row" style="margin-top:4px">
           <button type="button" class="addbtn" id="addTesti">+ Tambah testimoni</button>
         </div>
+      </div>
+    </div>
+
+    <!-- DELIVERY -->
+    <div class="tabpane" data-pane="deliv">
+      <div class="panel">
+        <h2>Link Ojek Online</h2>
+        <p class="hint" style="margin-top:0">Tempel link toko/menu kamu. Kalau dikosongin, logonya tampil <b>abu-abu + "Coming soon"</b> dan nggak bisa diklik. Begitu diisi, logonya otomatis aktif &amp; berwarna.</p>
+        <label>GrabFood</label><input type="text" id="dl_grab" placeholder="https://food.grab.com/...">
+        <label>GoFood</label><input type="text" id="dl_go" placeholder="https://gofood.co.id/...">
+        <label>ShopeeFood</label><input type="text" id="dl_shopee" placeholder="https://shopee.co.id/...">
       </div>
     </div>
 
@@ -328,8 +359,9 @@ function render(){
   $("t_rating").value=cfg.text.ratingText||"";$("t_bulktitle").value=cfg.text.bulkTitle||"";
   $("t_bulksub").value=cfg.text.bulkSub||"";$("t_paynote").value=cfg.text.payNote||"";
   $("b_on").checked=(cfg.boxesOn!==false);paintBoxArea();
-  cfg.availability=cfg.availability||{};calMonth=new Date();renderCalendar();
-  testiData=(Array.isArray(cfg.testimonials)?cfg.testimonials:[]).map(function(t){return {img:t.img||"",ig:t.ig||""};});renderTestis();
+  cfg.availability=cfg.availability||{};cfg.availabilityWeekly=cfg.availabilityWeekly||{};calMonth=new Date();renderWeekly();renderCalendar();
+  var DL=cfg.delivery||{};if($("dl_grab"))$("dl_grab").value=DL.grabfood||"";if($("dl_go"))$("dl_go").value=DL.gofood||"";if($("dl_shopee"))$("dl_shopee").value=DL.shopeefood||"";
+  testiData=(Array.isArray(cfg.testimonials)?cfg.testimonials:[]).map(function(t){return {type:(t.video?"video":"foto"),img:t.img||"",ig:t.ig||"",video:t.video||""};});renderTestis();
   renderProducts();renderBoxes();
 }
 
@@ -416,9 +448,11 @@ function renderCalendar(){
     var d=new Date(calMonth.getFullYear(),calMonth.getMonth(),dn);
     var ymd=calYmd(d);
     var past=d<today;
-    var st=cfg.availability[ymd]||"available";
+    var WK=cfg.availabilityWeekly||{};
+    var ovr=cfg.availability[ymd];
+    var st=ovr||WK[String(d.getDay())]||"available";
     var cell=document.createElement("button");cell.type="button";
-    cell.className="cal-cell "+(past?"past":(st==="full"?"full":(st==="limited"?"limited":"av")));
+    cell.className="cal-cell "+(past?"past":(st==="full"?"full":(st==="limited"?"limited":"av")))+(ovr?" ovr":"");
     var ic=past?"":(st==="full"?"✕":(st==="limited"?"⚠":"✓"));
     cell.innerHTML='<span class="dnum">'+dn+'</span><span class="ic">'+ic+'</span>';
     if(!past){cell.dataset.ymd=ymd;cell.addEventListener("click",function(){
@@ -433,6 +467,26 @@ function renderCalendar(){
 $("calPrev").addEventListener("click",function(){calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()-1,1);renderCalendar();});
 $("calNext").addEventListener("click",function(){calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()+1,1);renderCalendar();});
 $("calClear").addEventListener("click",function(){if(confirm("Reset semua tanggal jadi tersedia?")){cfg.availability={};renderCalendar();}});
+
+var WD_SHORT=["Min","Sen","Sel","Rab","Kam","Jum","Sab"];
+function renderWeekly(){
+  var box=$("wkGrid"); if(!box) return; box.innerHTML="";
+  cfg.availabilityWeekly=cfg.availabilityWeekly||{};
+  for(var i=0;i<7;i++){(function(dow){
+    var st=cfg.availabilityWeekly[String(dow)]||"available";
+    var cell=document.createElement("button");cell.type="button";
+    cell.className="wk-cell "+(st==="full"?"full":(st==="limited"?"limited":"av"));
+    var ic=st==="full"?"✕":(st==="limited"?"⚠":"✓");
+    cell.innerHTML='<span class="wd">'+WD_SHORT[dow]+'</span><span class="ic">'+ic+'</span>';
+    cell.addEventListener("click",function(){
+      var cur=cfg.availabilityWeekly[String(dow)]||"available";
+      var nx=cur==="available"?"limited":(cur==="limited"?"full":"available");
+      if(nx==="available")delete cfg.availabilityWeekly[String(dow)];else cfg.availabilityWeekly[String(dow)]=nx;
+      renderWeekly();renderCalendar();
+    });
+    box.appendChild(cell);
+  })(i);}
+}
 
 // ===== Testimoni =====
 var testiData=[];
@@ -455,23 +509,34 @@ function renderTestis(){
   var box=$("testis"); if(!box) return; box.innerHTML="";
   if(!testiData.length){ box.innerHTML='<p class="hint" style="margin:0 0 6px">Belum ada testimoni. Klik tombol di bawah untuk menambah.</p>'; }
   testiData.forEach(function(t,i){
+    var isVid=(t.type==="video");
     var row=document.createElement("div"); row.className="testi-row";
-    row.innerHTML='<div class="testi-thumb" data-th>'+(t.img?"":"Foto<br>9:16")+'</div>'+
+    var thumbInner = t.img ? "" : (isVid?"▶<br>Video":"Foto<br>9:16");
+    var upLabel = isVid ? "🖼️ "+(t.img?"Ganti":"Upload")+" poster <small>(opsional)</small>" : "📷 "+(t.img?"Ganti":"Upload")+" foto";
+    var vidField = isVid ? ('<label style="margin-top:8px">Link Reels / TikTok</label><input type="text" class="t-vid" value="'+esc(t.video||"")+'" placeholder="https://www.tiktok.com/@.../video/...  atau  https://instagram.com/reel/...">') : "";
+    row.innerHTML='<div class="testi-thumb" data-th>'+thumbInner+'</div>'+
       '<div class="testi-fields">'+
-        '<label>Username IG <small>(opsional)</small></label>'+
+        '<div class="seg t-type">'+
+          '<button type="button" data-ty="foto"'+(isVid?"":' class="on"')+'>Foto</button>'+
+          '<button type="button" data-ty="video"'+(isVid?' class="on"':"")+'>Video</button>'+
+        '</div>'+
+        vidField+
+        '<label style="margin-top:8px">Username IG <small>(opsional)</small></label>'+
         '<input type="text" class="t-ig" value="'+esc(t.ig||"")+'" placeholder="@username">'+
-        '<div class="testi-up"><label class="upbtn">📷 '+(t.img?"Ganti":"Upload")+' foto<input type="file" class="t-img" accept="image/*"></label>'+
+        '<div class="testi-up"><label class="upbtn">'+upLabel+'<input type="file" class="t-img" accept="image/*"></label>'+
         '<button type="button" class="testi-rm">Hapus</button></div>'+
       '</div>';
     box.appendChild(row);
     var thumb=row.querySelector("[data-th]");
     if(t.img){ thumb.style.backgroundImage="url('"+t.img+"')"; thumb.innerHTML=""; }
+    row.querySelectorAll(".t-type button").forEach(function(b){ b.addEventListener("click",function(){ testiData[i].type=this.dataset.ty; renderTestis(); }); });
+    if(isVid){ var vf=row.querySelector(".t-vid"); if(vf) vf.addEventListener("input",function(){ testiData[i].video=this.value; }); }
     row.querySelector(".t-ig").addEventListener("input",function(){ testiData[i].ig=this.value; });
     row.querySelector(".t-img").addEventListener("change",function(){ if(this.files[0]) compressTesti(this.files[0],function(u){ testiData[i].img=u; thumb.style.backgroundImage="url('"+u+"')"; thumb.innerHTML=""; }); });
     row.querySelector(".testi-rm").addEventListener("click",function(){ testiData.splice(i,1); renderTestis(); });
   });
 }
-$("addTesti").addEventListener("click",function(){ testiData.push({img:"",ig:""}); renderTestis(); });
+$("addTesti").addEventListener("click",function(){ testiData.push({type:"foto",img:"",ig:"",video:""}); renderTestis(); });
 
 $("p_mode").querySelectorAll("button").forEach(function(b){b.onclick=function(){promoMode=b.dataset.m;paintMode();paintPrices();};});
 function paintMode(){$("p_mode").querySelectorAll("button").forEach(function(b){b.classList.toggle("on",b.dataset.m===promoMode);});
@@ -495,7 +560,8 @@ $("save").addEventListener("click",function(){
   var hours=(promoMode==="midnight")?24:(promoMode==="rolling72")?72:(parseInt($("p_hours").value,10)||24);
   cfg.promo={on:$("p_on").checked,percent:parseInt($("p_pct").value,10)||20,label:$("p_label").value||"Promo hari ini",mode:mode,resetHours:hours};
   cfg.boxesOn=$("b_on").checked;cfg.ordersOn=$("o_on").checked;
-  cfg.testimonials=testiData.filter(function(t){return t.img;}).map(function(t){return {img:t.img,ig:(t.ig||"").trim()};});
+  cfg.testimonials=testiData.filter(function(t){return (t.type==="video")?(t.video&&t.video.trim()):t.img;}).map(function(t){var o={ig:(t.ig||"").trim()};if(t.type==="video"&&t.video&&t.video.trim())o.video=t.video.trim();if(t.img)o.img=t.img;return o;});
+  cfg.delivery={grabfood:($("dl_grab")?$("dl_grab").value.trim():""),gofood:($("dl_go")?$("dl_go").value.trim():""),shopeefood:($("dl_shopee")?$("dl_shopee").value.trim():"")};
   document.querySelectorAll(".prod").forEach(function(d){var id=d.dataset.id,p=cfg.products[id]||{};
     p.name=d.querySelector(".f-name").value;p.price=parseInt(d.querySelector(".f-price").value,10)||0;
     p.cat=d.querySelector(".f-cat").value;p.desc=d.querySelector(".f-desc").value;p.tagline=d.querySelector(".f-tagline").value;p.soldOut=d.querySelector(".f-sold").checked;
