@@ -183,13 +183,11 @@
             <div><label>Besar diskon (%) <small>saran 15–25%</small></label><input type="number" id="p_pct" min="1" max="80"></div>
             <div><label>Teks label</label><input type="text" id="p_label" placeholder="Promo hari ini"></div>
           </div>
-          <label>Reset / batas waktu</label>
-          <div class="seg" id="p_mode">
-            <button data-m="midnight">Harian (tengah malam)</button>
-            <button data-m="rolling72">Tiap 3 hari</button>
-            <button data-m="custom">Custom jam</button>
+          <label>Promo harian <small>(otomatis reset tiap hari)</small></label>
+          <div class="row">
+            <div><label>Jam mulai <small>(0–23)</small></label><input type="number" id="p_start" min="0" max="23" value="8"></div>
+            <div><label>Durasi (jam)</label><input type="number" id="p_dur" min="1" max="24" value="12"></div>
           </div>
-          <div id="p_custom" style="display:none"><label>Reset tiap berapa jam</label><input type="number" id="p_hours" min="1" value="24"></div>
           <p class="hint" id="p_explain"></p>
         </div>
       </div>
@@ -336,7 +334,7 @@ $("tabs").querySelectorAll("button").forEach(function(b){b.onclick=function(){
   window.scrollTo(0,0);};});
 
 function render(){
-  cfg.promo=cfg.promo||{on:true,percent:20,label:"Promo hari ini",mode:"midnight",resetHours:24};
+  cfg.promo=cfg.promo||{on:true,percent:20,label:"Promo hari ini",mode:"daily",startHour:8,durationHours:12};
   cfg.hero=cfg.hero||{line1:"",line2:"",copy:""};cfg.theme=cfg.theme||{accent:"#5A48CF"};
   cfg.products=cfg.products||{};cfg.boxes=cfg.boxes||[];photos={};
   if(cfg.boxesOn===undefined)cfg.boxesOn=true;if(cfg.ordersOn===undefined)cfg.ordersOn=true;
@@ -344,8 +342,8 @@ function render(){
   $("o_on").checked=(cfg.ordersOn!==false);paintOrders();
 
   $("p_on").checked=!!cfg.promo.on;$("p_pct").value=cfg.promo.percent||20;$("p_label").value=cfg.promo.label||"Promo hari ini";
-  promoMode=(cfg.promo.mode==="midnight")?"midnight":((cfg.promo.resetHours==72)?"rolling72":"custom");
-  $("p_hours").value=cfg.promo.resetHours||24;paintMode();$("promoFields").style.opacity=cfg.promo.on?"1":".5";
+  $("p_start").value=(cfg.promo.startHour!=null?cfg.promo.startHour:8);$("p_dur").value=(cfg.promo.durationHours!=null?cfg.promo.durationHours:12);
+  updatePromoExplain();$("promoFields").style.opacity=cfg.promo.on?"1":".5";
 
   $("h_l1").value=cfg.hero.line1||"";$("h_l2").value=cfg.hero.line2||"";$("h_copy").value=cfg.hero.copy||"";syncHeroPreview();
 
@@ -555,10 +553,16 @@ function renderTestis(){
 }
 $("addTesti").addEventListener("click",function(){ testiData.push({type:"foto",img:"",ig:"",video:""}); renderTestis(); });
 
-$("p_mode").querySelectorAll("button").forEach(function(b){b.onclick=function(){promoMode=b.dataset.m;paintMode();paintPrices();};});
-function paintMode(){$("p_mode").querySelectorAll("button").forEach(function(b){b.classList.toggle("on",b.dataset.m===promoMode);});
-  $("p_custom").style.display=promoMode==="custom"?"block":"none";
-  $("p_explain").textContent={midnight:"Reset tiap tengah malam. Cocok untuk \"fresh tiap hari\", urgensi paling kuat, diskon tak pernah hilang.",rolling72:"Reset tiap 3 hari. Countdown tampil \"X hari : jam : menit\".",custom:"Reset tiap sekian jam sesuai input."}[promoMode];}
+function z2(x){return(x<10?"0":"")+x;}
+function updatePromoExplain(){
+  var s=parseInt($("p_start").value,10); if(isNaN(s))s=8;
+  var d=parseInt($("p_dur").value,10); if(isNaN(d))d=12;
+  s=Math.max(0,Math.min(23,s)); d=Math.max(1,Math.min(24,d));
+  var endH=(s+d)%24;
+  var crosses=(s+d)>=24;
+  $("p_explain").innerHTML="Promo aktif tiap hari <b>"+z2(s)+":00</b> sampai <b>"+z2(endH)+":00</b>"+(crosses?" (besok)":"")+". Di luar jam itu banner &amp; harga coret otomatis hilang, lalu muncul lagi besok jam "+z2(s)+":00.";
+}
+["p_start","p_dur"].forEach(function(id){$(id).addEventListener("input",function(){updatePromoExplain();paintPrices();});});
 $("p_on").addEventListener("change",function(){$("promoFields").style.opacity=this.checked?"1":".5";paintPrices();});
 $("p_pct").addEventListener("input",paintPrices);
 
@@ -573,9 +577,9 @@ $("save").addEventListener("click",function(){
   cfg.text={eyebrow:$("t_eyebrow").value,preorderBar:$("t_preorder").value,ratingText:$("t_rating").value,bulkTitle:$("t_bulktitle").value,bulkSub:$("t_bulksub").value,payNote:$("t_paynote").value};
   var th=cfg.theme||{};th.accent=$("t_accent").value;delete th.font;cfg.theme=th;
   cfg.hero={line1:$("h_l1").value,line2:$("h_l2").value,copy:$("h_copy").value};
-  var mode=(promoMode==="midnight")?"midnight":"rolling";
-  var hours=(promoMode==="midnight")?24:(promoMode==="rolling72")?72:(parseInt($("p_hours").value,10)||24);
-  cfg.promo={on:$("p_on").checked,percent:parseInt($("p_pct").value,10)||20,label:$("p_label").value||"Promo hari ini",mode:mode,resetHours:hours};
+  var pStart=Math.max(0,Math.min(23,parseInt($("p_start").value,10)||8));
+  var pDur=Math.max(1,Math.min(24,parseInt($("p_dur").value,10)||12));
+  cfg.promo={on:$("p_on").checked,percent:parseInt($("p_pct").value,10)||20,label:$("p_label").value||"Promo hari ini",mode:"daily",startHour:pStart,durationHours:pDur};
   cfg.boxesOn=$("b_on").checked;cfg.ordersOn=$("o_on").checked;
   cfg.testimonials=testiData.filter(function(t){return (t.type==="video")?(t.vid||(t.video&&t.video.trim())||t.img):t.img;}).map(function(t){var o={ig:(t.ig||"").trim()};if(t.type==="video"){if(t.vid)o.vid=t.vid;if(t.video&&t.video.trim())o.video=t.video.trim();}if(t.img)o.img=t.img;return o;});
   cfg.delivery={grabfood:($("dl_grab")?$("dl_grab").value.trim():""),gofood:($("dl_go")?$("dl_go").value.trim():""),shopeefood:($("dl_shopee")?$("dl_shopee").value.trim():"")};
