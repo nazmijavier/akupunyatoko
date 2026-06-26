@@ -42,13 +42,14 @@
   .ph .ph-r{display:flex;align-items:center;gap:8px}
   .pid{font-size:11px;font-weight:700;color:var(--muted);background:var(--soft);padding:3px 8px;border-radius:999px}
   .pid.new{background:#e7fbef;color:#157a44}
-  .ptype{font-size:11px;font-weight:800;color:var(--accent);background:#efeafc;padding:3px 8px;border-radius:999px}
-  .ptype.dcc{color:#9a5a1e;background:#fbeeda}
   .pricePrev{font-size:13px;font-weight:700;margin-top:6px}
   .pricePrev s{color:var(--muted);font-weight:600;margin-right:6px}
   .pricePrev .now{color:var(--accent)}
   .pricePrev .off{background:#fdecec;color:#d23;font-weight:800;font-size:11px;padding:2px 7px;border-radius:999px;margin-left:6px}
   .soldtag{font-size:11px;font-weight:800;color:#fff;background:#d23;padding:3px 9px;border-radius:999px;display:none}
+  .badgePrev{font-size:11px;font-weight:800;color:#fff;padding:3px 9px;border-radius:999px;display:none}
+  .badgePrev.terlaris{background:#E8902E;display:inline-block}
+  .badgePrev.new{background:#2b2350;display:inline-block}
   .prod.sold .soldtag{display:inline-block}
   .photoRow{display:flex;gap:12px;align-items:center;margin:8px 0 4px}
   .thumb{width:72px;height:72px;border-radius:10px;border:1px solid var(--line);background:#f1edfa center/cover no-repeat;flex:none;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--muted);text-align:center;padding:4px}
@@ -85,44 +86,6 @@
   .btn-ghost{background:#fff;color:var(--ink);border:1px solid var(--line);flex:none;padding:14px 16px}
   .ok-msg{display:none;position:fixed;left:16px;right:16px;bottom:76px;max-width:748px;margin:0 auto;z-index:31;background:#eafaf0;border:1px solid #bfe9cf;color:#157a44;border-radius:10px;padding:10px 12px;font-size:13px;font-weight:700}
   .dim{opacity:.4;pointer-events:none}
-  /* availability calendar */
-  .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-  .cal-title{font-size:16px;font-weight:800}
-  .cal-nav{display:flex;gap:8px}
-  .cal-nav button{width:36px;height:36px;border-radius:9px;border:1px solid var(--line);background:#fffdf8;font-size:18px;font-family:inherit;color:var(--ink);cursor:pointer}
-  .cal-nav button:disabled{opacity:.35;cursor:not-allowed}
-  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
-  .wk-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
-  .wk-cell{border:1px solid var(--line);border-radius:10px;padding:9px 2px;background:#fff;cursor:pointer;font-family:inherit;text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px}
-  .wk-cell .wd{font-size:11px;font-weight:800;color:var(--muted)}
-  .wk-cell .ic{font-size:13px;font-weight:800}
-  .wk-cell.av{background:#eaf8ef;border-color:#bfe6cd}.wk-cell.av .ic{color:#1c9d54}
-  .wk-cell.limited{background:#fff5e2;border-color:#f3d79a}.wk-cell.limited .ic{color:#c98a12}
-  .wk-cell.full{background:#fdecec;border-color:#f3b9b9}.wk-cell.full .ic{color:#d23}
-  .cal-cell.ovr{box-shadow:inset 0 0 0 2px rgba(43,35,80,.35)}
-  .cal-cell.ovr .dnum::after{content:"•";margin-left:2px;color:var(--accent)}
-  .cal-dow{text-align:center;font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;padding-bottom:4px}
-  .cal-cell{aspect-ratio:1/1;border:1px solid var(--line);border-radius:10px;background:#fffdf8;font-family:inherit;font-size:14px;font-weight:700;color:var(--ink);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0;transition:.12s}
-  .cal-cell .ic{font-size:11px;line-height:1}
-  .cal-cell.empty{border:0;background:none;cursor:default}
-  .cal-cell.past{opacity:.32;cursor:not-allowed;background:#f3f0e8}
-  .cal-cell.av{border-color:#bfe6cc;background:#f1faf4}.cal-cell.av .ic{color:#1faa59}
-  .cal-cell.limited{border-color:#f0c879;background:#fff7e8}.cal-cell.limited .ic{color:#E8902E}
-  .cal-cell.full{border-color:#f0c2c2;background:#fdeeee}.cal-cell.full .ic{color:#d23}
-  .cal-cell:not(.empty):not(.past):hover{box-shadow:0 0 0 2px var(--accent)}
-  .cal-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;font-size:12.5px;font-weight:700;color:var(--muted)}
-  .cal-legend span{display:inline-flex;align-items:center;gap:6px}
-  .cal-legend i{font-style:normal}
-  .cal-legend .l-av{color:#1faa59}.cal-legend .l-lim{color:#E8902E}.cal-legend .l-full{color:#d23}
-  .cal-actions{margin-top:12px}
-  .cal-clear{background:none;border:0;color:#d23;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;padding:0}
-  /* testimoni editor */
-  .testi-row{display:flex;gap:14px;align-items:flex-start;border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:12px;background:#fffdf8}
-  .testi-thumb{flex:none;width:72px;aspect-ratio:9/16;border-radius:10px;background:#efeafc center/cover no-repeat;border:1px dashed var(--line);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--muted);text-align:center;overflow:hidden}
-  .testi-fields{flex:1;min-width:0}
-  .testi-fields label{margin-top:0}
-  .testi-up{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
-  .testi-rm{background:none;border:0;color:#d23;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;padding:4px 0}
 </style>
 </head>
 <body>
@@ -149,9 +112,6 @@
       <button data-t="hero">✏️ Hero</button>
       <button data-t="look">🎨 Warna</button>
       <button data-t="box">📦 Box</button>
-      <button data-t="dates">📅 Tanggal</button>
-      <button data-t="testi">📸 Testimoni</button>
-      <button data-t="deliv">🛵 Antar</button>
       <button data-t="text">📝 Teks</button>
     </div>
 
@@ -183,11 +143,13 @@
             <div><label>Besar diskon (%) <small>saran 15–25%</small></label><input type="number" id="p_pct" min="1" max="80"></div>
             <div><label>Teks label</label><input type="text" id="p_label" placeholder="Promo hari ini"></div>
           </div>
-          <label>Promo harian <small>(otomatis reset tiap hari)</small></label>
-          <div class="row">
-            <div><label>Jam mulai <small>(0–23)</small></label><input type="number" id="p_start" min="0" max="23" value="8"></div>
-            <div><label>Durasi (jam)</label><input type="number" id="p_dur" min="1" max="24" value="12"></div>
+          <label>Reset / batas waktu</label>
+          <div class="seg" id="p_mode">
+            <button data-m="midnight">Harian (tengah malam)</button>
+            <button data-m="rolling72">Tiap 3 hari</button>
+            <button data-m="custom">Custom jam</button>
           </div>
+          <div id="p_custom" style="display:none"><label>Reset tiap berapa jam</label><input type="number" id="p_hours" min="1" value="24"></div>
           <p class="hint" id="p_explain"></p>
         </div>
       </div>
@@ -228,58 +190,6 @@
           <div id="boxes"></div>
           <button type="button" class="addbtn" id="addBox" style="width:100%">+ Tambah box</button>
         </div>
-      </div>
-    </div>
-
-    <!-- TANGGAL -->
-    <div class="tabpane" data-pane="dates">
-      <div class="panel">
-        <h2>Aturan Mingguan</h2>
-        <p class="hint" style="margin-top:0">Klik hari untuk set status default tiap minggu (Tersedia → Perlu konfirmasi → Penuh). Berlaku otomatis ke semua tanggal yang belum kamu atur manual di kalender bawah.</p>
-        <div class="wk-grid" id="wkGrid"></div>
-        <div class="cal-legend">
-          <span><i class="l-av">●</i> Tersedia</span>
-          <span><i class="l-lim">●</i> Perlu konfirmasi</span>
-          <span><i class="l-full">●</i> Penuh</span>
-        </div>
-      </div>
-      <div class="panel">
-        <h2>Ketersediaan Tanggal</h2>
-        <p class="hint" style="margin-top:0">Klik tanggal untuk override status tertentu: <b>Tersedia</b> → <b>Perlu konfirmasi</b> → <b>Penuh</b> → balik ngikut aturan mingguan. Tanggal <b>Penuh</b> nggak bisa dipilih pembeli. Tanggal ber-titik = di-override manual.</p>
-        <div class="cal-head">
-          <span class="cal-title" id="calTitle"></span>
-          <div class="cal-nav"><button type="button" id="calPrev">&lsaquo;</button><button type="button" id="calNext">&rsaquo;</button></div>
-        </div>
-        <div class="cal-grid" id="cal"></div>
-        <div class="cal-legend">
-          <span><i class="l-av">●</i> Tersedia</span>
-          <span><i class="l-lim">●</i> Perlu konfirmasi</span>
-          <span><i class="l-full">●</i> Penuh</span>
-        </div>
-        <div class="cal-actions"><button type="button" class="cal-clear" id="calClear">Reset semua tanggal jadi tersedia</button></div>
-      </div>
-    </div>
-
-    <!-- TESTIMONI -->
-    <div class="tabpane" data-pane="testi">
-      <div class="panel">
-        <h2>Testimoni Pelanggan</h2>
-        <p class="hint" style="margin-top:0">Foto pelanggan yang tampil di carousel paling bawah halaman Pesan. Foto otomatis dipotong jadi <b>9:16 (potrait)</b> &amp; dikompres. Username IG opsional, kosongkan kalau nggak mau ditampilkan.</p>
-        <div id="testis"></div>
-        <div class="row" style="margin-top:4px">
-          <button type="button" class="addbtn" id="addTesti">+ Tambah testimoni</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- DELIVERY -->
-    <div class="tabpane" data-pane="deliv">
-      <div class="panel">
-        <h2>Link Ojek Online</h2>
-        <p class="hint" style="margin-top:0">Tempel link toko/menu kamu. Kalau dikosongin, logonya tampil <b>abu-abu + "Coming soon"</b> dan nggak bisa diklik. Begitu diisi, logonya otomatis aktif &amp; berwarna.</p>
-        <label>GrabFood</label><input type="text" id="dl_grab" placeholder="https://food.grab.com/...">
-        <label>GoFood</label><input type="text" id="dl_go" placeholder="https://gofood.co.id/...">
-        <label>ShopeeFood</label><input type="text" id="dl_shopee" placeholder="https://shopee.co.id/...">
       </div>
     </div>
 
@@ -334,7 +244,7 @@ $("tabs").querySelectorAll("button").forEach(function(b){b.onclick=function(){
   window.scrollTo(0,0);};});
 
 function render(){
-  cfg.promo=cfg.promo||{on:true,percent:20,label:"Promo hari ini",mode:"daily",startHour:8,durationHours:12};
+  cfg.promo=cfg.promo||{on:true,percent:20,label:"Promo hari ini",mode:"midnight",resetHours:24};
   cfg.hero=cfg.hero||{line1:"",line2:"",copy:""};cfg.theme=cfg.theme||{accent:"#5A48CF"};
   cfg.products=cfg.products||{};cfg.boxes=cfg.boxes||[];photos={};
   if(cfg.boxesOn===undefined)cfg.boxesOn=true;if(cfg.ordersOn===undefined)cfg.ordersOn=true;
@@ -342,8 +252,8 @@ function render(){
   $("o_on").checked=(cfg.ordersOn!==false);paintOrders();
 
   $("p_on").checked=!!cfg.promo.on;$("p_pct").value=cfg.promo.percent||20;$("p_label").value=cfg.promo.label||"Promo hari ini";
-  $("p_start").value=(cfg.promo.startHour!=null?cfg.promo.startHour:8);$("p_dur").value=(cfg.promo.durationHours!=null?cfg.promo.durationHours:12);
-  updatePromoExplain();$("promoFields").style.opacity=cfg.promo.on?"1":".5";
+  promoMode=(cfg.promo.mode==="midnight")?"midnight":((cfg.promo.resetHours==72)?"rolling72":"custom");
+  $("p_hours").value=cfg.promo.resetHours||24;paintMode();$("promoFields").style.opacity=cfg.promo.on?"1":".5";
 
   $("h_l1").value=cfg.hero.line1||"";$("h_l2").value=cfg.hero.line2||"";$("h_copy").value=cfg.hero.copy||"";syncHeroPreview();
 
@@ -357,9 +267,6 @@ function render(){
   $("t_rating").value=cfg.text.ratingText||"";$("t_bulktitle").value=cfg.text.bulkTitle||"";
   $("t_bulksub").value=cfg.text.bulkSub||"";$("t_paynote").value=cfg.text.payNote||"";
   $("b_on").checked=(cfg.boxesOn!==false);paintBoxArea();
-  cfg.availability=cfg.availability||{};cfg.availabilityWeekly=cfg.availabilityWeekly||{};calMonth=new Date();renderWeekly();renderCalendar();
-  var DL=cfg.delivery||{};if($("dl_grab"))$("dl_grab").value=DL.grabfood||"";if($("dl_go"))$("dl_go").value=DL.gofood||"";if($("dl_shopee"))$("dl_shopee").value=DL.shopeefood||"";
-  testiData=(Array.isArray(cfg.testimonials)?cfg.testimonials:[]).map(function(t){return {type:((t.video||t.vid)?"video":"foto"),img:t.img||"",ig:t.ig||"",video:t.video||"",vid:t.vid||""};});renderTestis();
   renderProducts();renderBoxes();
 }
 
@@ -370,13 +277,11 @@ function renderProducts(){
     var d=document.createElement("div");d.className="prod"+(p.soldOut?" sold":"");d.dataset.id=id;
     var opts=CATS.map(function(c){return '<option value="'+c[0]+'"'+(p.cat===c[0]?" selected":"")+'>'+c[1]+'</option>';}).join("");
     var isNew=addedIds[id];
-    var isDubai=/^dcc/.test(id)||/^satuan_/.test(id)||p.type==="dubai"||("short" in p);
-    d.innerHTML='<div class="ph"><div style="display:flex;align-items:center;gap:8px"><b>'+esc(p.name||id)+'</b><span class="soldtag">Habis</span></div>'+
-      '<div class="ph-r"><span class="ptype'+(isDubai?' dcc':'')+'">'+(isDubai?'Dubai':'Mochi')+'</span><span class="pid'+(isNew?' new':'')+'">'+(isNew?'baru':id)+'</span>'+(isNew?'<button type="button" class="rmprod">Hapus</button>':'')+'</div></div>'+
+    d.innerHTML='<div class="ph"><div style="display:flex;align-items:center;gap:8px"><b>'+esc(p.name||id)+'</b><span class="soldtag">Habis</span><span class="badgePrev"></span></div>'+
+      '<div class="ph-r"><span class="pid'+(isNew?' new':'')+'">'+(isNew?'baru':id)+'</span>'+(isNew?'<button type="button" class="rmprod">Hapus</button>':'')+'</div></div>'+
       '<label class="switch red"><input type="checkbox" class="f-sold"'+(p.soldOut?' checked':'')+'><span class="track"></span> Tandai habis</label>'+
       '<div class="photoRow"><div class="thumb" data-thumb></div><div class="upwrap"><label class="upbtn">📷 Ganti foto<input type="file" class="f-img" accept="image/*"></label><button type="button" class="rmimg">Hapus</button><div class="imgnote"></div></div></div>'+
-      (isDubai?'<label>Teks di kartu <small>(yang tampil di situs, mis. Small / Big)</small></label><input type="text" class="f-short" value="'+esc(p.short||"")+'">':'')+
-      '<label>Nama'+(isDubai?' lengkap <small>(dipakai di chat WhatsApp)</small>':'')+'</label><input type="text" class="f-name" value="'+esc(p.name)+'">'+
+      '<label>Nama</label><input type="text" class="f-name" value="'+esc(p.name)+'">'+
       '<label>Deskripsi singkat <small>(tampil di bawah judul)</small></label><input type="text" class="f-tagline" value="'+esc(p.tagline)+'" placeholder="Isi cheesecake creamy + selai stroberi">'+
       '<div class="row"><div><label>Harga (Rp)</label><input type="number" class="f-price" value="'+(p.price||0)+'"></div>'+
       '<div><label>Kategori / badge</label><select class="f-cat">'+opts+'</select></div></div>'+
@@ -385,6 +290,7 @@ function renderProducts(){
     d.querySelector(".f-name").addEventListener("input",function(){d.querySelector(".ph b").textContent=this.value||id;});
     d.querySelector(".f-price").addEventListener("input",paintPrices);
     d.querySelector(".f-sold").addEventListener("change",function(){d.classList.toggle("sold",this.checked);});
+    var catEl=d.querySelector(".f-cat");function pbadge(){var v=catEl.value,bp=d.querySelector(".badgePrev");bp.className="badgePrev "+(v||"");bp.textContent=v==="new"?"New":(v==="terlaris"?"Terlaris":"");}catEl.addEventListener("change",pbadge);pbadge();
     var rmp=d.querySelector(".rmprod");if(rmp)rmp.addEventListener("click",function(){if(confirm("Hapus produk ini?")){delete cfg.products[id];delete addedIds[id];renderProducts();}});
     paintThumb(d,id);
     d.querySelector(".f-img").addEventListener("change",function(){if(this.files[0])compress(this.files[0],function(u){photos[id]=u;paintThumb(d,id);});});
@@ -423,146 +329,10 @@ function paintBoxArea(){var on=$("b_on").checked;$("boxArea").classList.toggle("
 $("o_on").addEventListener("change",paintOrders);
 function paintOrders(){var on=$("o_on").checked;$("o_explain").textContent=on?"Pembeli bisa pesan seperti biasa.":"Pesanan ditutup: tombol Pesan dimatikan & banner \"ditutup sementara\" muncul di situs.";}
 
-// ===== Kalender ketersediaan =====
-var CAL_DOW=["Min","Sen","Sel","Rab","Kam","Jum","Sab"];
-var CAL_MON=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
-var calMonth=new Date();
-function calYmd(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
-function renderCalendar(){
-  cfg.availability=cfg.availability||{};
-  var grid=$("cal");if(!grid)return;grid.innerHTML="";
-  var today=new Date();today.setHours(0,0,0,0);
-  var curMonthStart=new Date(today.getFullYear(),today.getMonth(),1);
-  if(calMonth<curMonthStart)calMonth=new Date(curMonthStart);
-  calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth(),1);
-  $("calTitle").textContent=CAL_MON[calMonth.getMonth()]+" "+calMonth.getFullYear();
-  $("calPrev").disabled=(calMonth.getFullYear()===curMonthStart.getFullYear()&&calMonth.getMonth()===curMonthStart.getMonth());
-  CAL_DOW.forEach(function(w){var h=document.createElement("div");h.className="cal-dow";h.textContent=w;grid.appendChild(h);});
-  var first=new Date(calMonth.getFullYear(),calMonth.getMonth(),1);
-  var lead=first.getDay();
-  var days=new Date(calMonth.getFullYear(),calMonth.getMonth()+1,0).getDate();
-  for(var i=0;i<lead;i++){var e=document.createElement("div");e.className="cal-cell empty";grid.appendChild(e);}
-  for(var dn=1;dn<=days;dn++){
-    var d=new Date(calMonth.getFullYear(),calMonth.getMonth(),dn);
-    var ymd=calYmd(d);
-    var past=d<today;
-    var WK=cfg.availabilityWeekly||{};
-    var ovr=cfg.availability[ymd];
-    var st=ovr||WK[String(d.getDay())]||"available";
-    var cell=document.createElement("button");cell.type="button";
-    cell.className="cal-cell "+(past?"past":(st==="full"?"full":(st==="limited"?"limited":"av")))+(ovr?" ovr":"");
-    var ic=past?"":(st==="full"?"✕":(st==="limited"?"⚠":"✓"));
-    cell.innerHTML='<span class="dnum">'+dn+'</span><span class="ic">'+ic+'</span>';
-    if(!past){cell.dataset.ymd=ymd;cell.addEventListener("click",function(){
-      var k=this.dataset.ymd,cur=cfg.availability[k]||"available";
-      var nx=cur==="available"?"limited":(cur==="limited"?"full":"available");
-      if(nx==="available")delete cfg.availability[k];else cfg.availability[k]=nx;
-      renderCalendar();
-    });}
-    grid.appendChild(cell);
-  }
-}
-$("calPrev").addEventListener("click",function(){calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()-1,1);renderCalendar();});
-$("calNext").addEventListener("click",function(){calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()+1,1);renderCalendar();});
-$("calClear").addEventListener("click",function(){if(confirm("Reset semua tanggal jadi tersedia?")){cfg.availability={};renderCalendar();}});
-
-var WD_SHORT=["Min","Sen","Sel","Rab","Kam","Jum","Sab"];
-function renderWeekly(){
-  var box=$("wkGrid"); if(!box) return; box.innerHTML="";
-  cfg.availabilityWeekly=cfg.availabilityWeekly||{};
-  for(var i=0;i<7;i++){(function(dow){
-    var st=cfg.availabilityWeekly[String(dow)]||"available";
-    var cell=document.createElement("button");cell.type="button";
-    cell.className="wk-cell "+(st==="full"?"full":(st==="limited"?"limited":"av"));
-    var ic=st==="full"?"✕":(st==="limited"?"⚠":"✓");
-    cell.innerHTML='<span class="wd">'+WD_SHORT[dow]+'</span><span class="ic">'+ic+'</span>';
-    cell.addEventListener("click",function(){
-      var cur=cfg.availabilityWeekly[String(dow)]||"available";
-      var nx=cur==="available"?"limited":(cur==="limited"?"full":"available");
-      if(nx==="available")delete cfg.availabilityWeekly[String(dow)];else cfg.availabilityWeekly[String(dow)]=nx;
-      renderWeekly();renderCalendar();
-    });
-    box.appendChild(cell);
-  })(i);}
-}
-
-// ===== Testimoni =====
-var testiData=[];
-function compressTesti(file,cb){
-  var im=new Image();
-  im.onload=function(){
-    var TW=480, R=16/9, w=im.width, h=im.height, sx=0,sy=0,sw=w,sh=h;
-    var th=Math.round(w*R);
-    if(th<=h){ sy=Math.round((h-th)/2); sh=th; }
-    else { var tw=Math.round(h/R); sx=Math.round((w-tw)/2); sw=tw; }
-    var nh=Math.round(TW*R);
-    var c=document.createElement("canvas"); c.width=TW; c.height=nh;
-    c.getContext("2d").drawImage(im, sx,sy,sw,sh, 0,0,TW,nh);
-    cb(c.toDataURL("image/jpeg",0.72));
-  };
-  im.onerror=function(){alert("Foto gagal dibaca.");};
-  im.src=URL.createObjectURL(file);
-}
-function readVideo(file,cb){
-  if(file.size>15*1024*1024 && !confirm("Video "+(file.size/1048576).toFixed(1)+"MB cukup besar dan bisa bikin situs lambat. Saran: pakai klip pendek (<10 dtk) yang sudah dikompres. Tetap pakai?")) return;
-  var rd=new FileReader();
-  rd.onload=function(){ cb(rd.result); };
-  rd.onerror=function(){ alert("Video gagal dibaca."); };
-  rd.readAsDataURL(file);
-}
-function renderTestis(){
-  var box=$("testis"); if(!box) return; box.innerHTML="";
-  if(!testiData.length){ box.innerHTML='<p class="hint" style="margin:0 0 6px">Belum ada testimoni. Klik tombol di bawah untuk menambah.</p>'; }
-  testiData.forEach(function(t,i){
-    var isVid=(t.type==="video");
-    var row=document.createElement("div"); row.className="testi-row";
-    var thumbInner = t.img ? "" : (t.vid?"🎬<br>Video":(isVid?"▶<br>Video":"Foto<br>9:16"));
-    var upLabel = isVid ? "🖼️ "+(t.img?"Ganti":"Upload")+" poster <small>(opsional)</small>" : "📷 "+(t.img?"Ganti":"Upload")+" foto";
-    var vidUp = isVid ? (
-        '<label style="margin-top:8px">Upload video <small>(autoplay di carousel, tanpa suara, mp4 pendek)</small></label>'+
-        '<div class="testi-up"><label class="upbtn">🎬 '+(t.vid?"Ganti":"Upload")+' video<input type="file" class="t-vidfile" accept="video/*"></label>'+
-        '<span class="t-vidstat hint" style="margin:0;font-weight:700">'+(t.vid?"✓ video tersimpan":"belum ada video")+'</span></div>'+
-        '<label style="margin-top:10px">atau Link Reels / TikTok <small>(diputar pas diklik, ada suara)</small></label>'+
-        '<input type="text" class="t-vid" value="'+esc(t.video||"")+'" placeholder="https://www.tiktok.com/...  /  https://instagram.com/reel/...">'
-      ) : "";
-    row.innerHTML='<div class="testi-thumb" data-th>'+thumbInner+'</div>'+
-      '<div class="testi-fields">'+
-        '<div class="seg t-type">'+
-          '<button type="button" data-ty="foto"'+(isVid?"":' class="on"')+'>Foto</button>'+
-          '<button type="button" data-ty="video"'+(isVid?' class="on"':"")+'>Video</button>'+
-        '</div>'+
-        vidUp+
-        '<label style="margin-top:8px">Username IG <small>(opsional)</small></label>'+
-        '<input type="text" class="t-ig" value="'+esc(t.ig||"")+'" placeholder="@username">'+
-        '<div class="testi-up"><label class="upbtn">'+upLabel+'<input type="file" class="t-img" accept="image/*"></label>'+
-        '<button type="button" class="testi-rm">Hapus</button></div>'+
-      '</div>';
-    box.appendChild(row);
-    var thumb=row.querySelector("[data-th]");
-    if(t.img){ thumb.style.backgroundImage="url('"+t.img+"')"; thumb.innerHTML=""; }
-    row.querySelectorAll(".t-type button").forEach(function(b){ b.addEventListener("click",function(){ testiData[i].type=this.dataset.ty; renderTestis(); }); });
-    if(isVid){
-      var vf=row.querySelector(".t-vid"); if(vf) vf.addEventListener("input",function(){ testiData[i].video=this.value; });
-      var vfile=row.querySelector(".t-vidfile"), vstat=row.querySelector(".t-vidstat");
-      if(vfile) vfile.addEventListener("change",function(){ if(this.files[0]) readVideo(this.files[0],function(u){ testiData[i].vid=u; if(vstat){vstat.textContent="✓ video tersimpan";} if(!t.img){ thumb.innerHTML="🎬<br>Video"; } }); });
-    }
-    row.querySelector(".t-ig").addEventListener("input",function(){ testiData[i].ig=this.value; });
-    row.querySelector(".t-img").addEventListener("change",function(){ if(this.files[0]) compressTesti(this.files[0],function(u){ testiData[i].img=u; thumb.style.backgroundImage="url('"+u+"')"; thumb.innerHTML=""; }); });
-    row.querySelector(".testi-rm").addEventListener("click",function(){ testiData.splice(i,1); renderTestis(); });
-  });
-}
-$("addTesti").addEventListener("click",function(){ testiData.push({type:"foto",img:"",ig:"",video:""}); renderTestis(); });
-
-function z2(x){return(x<10?"0":"")+x;}
-function updatePromoExplain(){
-  var s=parseInt($("p_start").value,10); if(isNaN(s))s=8;
-  var d=parseInt($("p_dur").value,10); if(isNaN(d))d=12;
-  s=Math.max(0,Math.min(23,s)); d=Math.max(1,Math.min(24,d));
-  var endH=(s+d)%24;
-  var crosses=(s+d)>=24;
-  $("p_explain").innerHTML="Promo aktif tiap hari <b>"+z2(s)+":00</b> sampai <b>"+z2(endH)+":00</b>"+(crosses?" (besok)":"")+". Di luar jam itu banner &amp; harga coret otomatis hilang, lalu muncul lagi besok jam "+z2(s)+":00.";
-}
-["p_start","p_dur"].forEach(function(id){$(id).addEventListener("input",function(){updatePromoExplain();paintPrices();});});
+$("p_mode").querySelectorAll("button").forEach(function(b){b.onclick=function(){promoMode=b.dataset.m;paintMode();paintPrices();};});
+function paintMode(){$("p_mode").querySelectorAll("button").forEach(function(b){b.classList.toggle("on",b.dataset.m===promoMode);});
+  $("p_custom").style.display=promoMode==="custom"?"block":"none";
+  $("p_explain").textContent={midnight:"Reset tiap tengah malam. Cocok untuk \"fresh tiap hari\", urgensi paling kuat, diskon tak pernah hilang.",rolling72:"Reset tiap 3 hari. Countdown tampil \"X hari : jam : menit\".",custom:"Reset tiap sekian jam sesuai input."}[promoMode];}
 $("p_on").addEventListener("change",function(){$("promoFields").style.opacity=this.checked?"1":".5";paintPrices();});
 $("p_pct").addEventListener("input",paintPrices);
 
@@ -577,16 +347,13 @@ $("save").addEventListener("click",function(){
   cfg.text={eyebrow:$("t_eyebrow").value,preorderBar:$("t_preorder").value,ratingText:$("t_rating").value,bulkTitle:$("t_bulktitle").value,bulkSub:$("t_bulksub").value,payNote:$("t_paynote").value};
   var th=cfg.theme||{};th.accent=$("t_accent").value;delete th.font;cfg.theme=th;
   cfg.hero={line1:$("h_l1").value,line2:$("h_l2").value,copy:$("h_copy").value};
-  var pStart=Math.max(0,Math.min(23,parseInt($("p_start").value,10)||8));
-  var pDur=Math.max(1,Math.min(24,parseInt($("p_dur").value,10)||12));
-  cfg.promo={on:$("p_on").checked,percent:parseInt($("p_pct").value,10)||20,label:$("p_label").value||"Promo hari ini",mode:"daily",startHour:pStart,durationHours:pDur};
+  var mode=(promoMode==="midnight")?"midnight":"rolling";
+  var hours=(promoMode==="midnight")?24:(promoMode==="rolling72")?72:(parseInt($("p_hours").value,10)||24);
+  cfg.promo={on:$("p_on").checked,percent:parseInt($("p_pct").value,10)||20,label:$("p_label").value||"Promo hari ini",mode:mode,resetHours:hours};
   cfg.boxesOn=$("b_on").checked;cfg.ordersOn=$("o_on").checked;
-  cfg.testimonials=testiData.filter(function(t){return (t.type==="video")?(t.vid||(t.video&&t.video.trim())||t.img):t.img;}).map(function(t){var o={ig:(t.ig||"").trim()};if(t.type==="video"){if(t.vid)o.vid=t.vid;if(t.video&&t.video.trim())o.video=t.video.trim();}if(t.img)o.img=t.img;return o;});
-  cfg.delivery={grabfood:($("dl_grab")?$("dl_grab").value.trim():""),gofood:($("dl_go")?$("dl_go").value.trim():""),shopeefood:($("dl_shopee")?$("dl_shopee").value.trim():"")};
   document.querySelectorAll(".prod").forEach(function(d){var id=d.dataset.id,p=cfg.products[id]||{};
     p.name=d.querySelector(".f-name").value;p.price=parseInt(d.querySelector(".f-price").value,10)||0;
     p.cat=d.querySelector(".f-cat").value;p.desc=d.querySelector(".f-desc").value;p.tagline=d.querySelector(".f-tagline").value;p.soldOut=d.querySelector(".f-sold").checked;
-    var sh=d.querySelector(".f-short");if(sh)p.short=sh.value;
     if(photos[id]&&photos[id].indexOf("data:")===0)p.img=photos[id];else if("img" in p)delete p.img;
     cfg.products[id]=p;});
   document.querySelectorAll(".boxcard").forEach(function(d){var b=cfg.boxes[+d.dataset.idx];if(!b)return;
